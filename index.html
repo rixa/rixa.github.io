@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>Riza Fauji | System Monitor</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="favicon.png">
+<link rel="icon" type="image/png" href="favicon.png">
 <meta name="description" content="Riza Fauji - Terminal Style Developer Portfolio">
 <meta name="author" content="Riza Fauji">
 
@@ -33,6 +33,34 @@ body::after {
     transparent 3px
   );
   pointer-events: none;
+}
+
+/* BOOT SCREEN */
+#boot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  color: #00ff99;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  z-index: 9999;
+  flex-direction: column;
+}
+
+.fade-out {
+  animation: fadeOut 1s forwards;
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
 }
 
 .clock {
@@ -113,6 +141,11 @@ body::after {
 </head>
 <body>
 
+<!-- BOOT SCREEN -->
+<div id="boot">
+  <div id="boot-text"></div>
+</div>
+
 <div class="clock" id="clock"></div>
 
 <div class="container">
@@ -136,33 +169,43 @@ body::after {
   <div class="links">
     <div>user@riza:~$ contact</div>
 
-    <a href="mailto:rizafauziaja@gmail.com">
-      ├── [MAIL] Email
-    </a>
-
-    <a href="https://linkedin.com/in/riza221" target="_blank">
-      ├── [NET ] LinkedIn
-    </a>
-
-    <a href="https://wa.me/6282132746345" target="_blank">
-      ├── [MSG ] WhatsApp
-    </a>
-
-    <a href="https://t.me/rizax_fauz" target="_blank">
-      ├── [TG  ] Telegram
-    </a>
-
-    <a href="https://medium.com/@rizafauziaja" target="_blank">
-      ├── [DOC ] Medium
-    </a>
-
-    <a href="https://farcaster.xyz/riza221" target="_blank">
-      └── [SOC ] Farcaster
-    </a>
+    <a href="mailto:rizafauziaja@gmail.com">├── [MAIL] Email</a>
+    <a href="https://linkedin.com/in/riza221" target="_blank">├── [NET ] LinkedIn</a>
+    <a href="https://wa.me/6282132746345" target="_blank">├── [MSG ] WhatsApp</a>
+    <a href="https://t.me/rizax_fauz" target="_blank">├── [TG  ] Telegram</a>
+    <a href="https://medium.com/@rizafauziaja" target="_blank">├── [DOC ] Medium</a>
+    <a href="https://farcaster.xyz/riza221" target="_blank">└── [SOC ] Farcaster</a>
   </div>
 </div>
 
 <script>
+/* BOOTING ANIMATION */
+const bootLines = [
+  "Initializing system...",
+  "Loading modules...",
+  "Access granted."
+];
+
+const bootText = document.getElementById("boot-text");
+let lineIndex = 0;
+
+function showBootLine() {
+  if (lineIndex < bootLines.length) {
+    const p = document.createElement("div");
+    p.textContent = bootLines[lineIndex];
+    bootText.appendChild(p);
+    lineIndex++;
+    setTimeout(showBootLine, 800);
+  } else {
+    setTimeout(() => {
+      document.getElementById("boot").classList.add("fade-out");
+    }, 800);
+  }
+}
+
+window.onload = showBootLine;
+
+/* SKILL BARS */
 function animateBar(id, min, max) {
   const el = document.getElementById(id);
   setInterval(() => {
@@ -175,7 +218,7 @@ animateBar("frontend", 75, 95);
 animateBar("backend", 65, 85);
 animateBar("problem", 80, 98);
 
-// Realtime clock
+/* CLOCK */
 function updateClock() {
   const now = new Date();
   const time = now.toLocaleTimeString();
