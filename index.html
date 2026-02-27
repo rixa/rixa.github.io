@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <title>Riza Fauji | System Monitor</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="favicon.png">
+<meta name="description" content="Riza Fauji - Terminal Style Developer Portfolio">
+<meta name="author" content="Riza Fauji">
 
 <style>
 body {
@@ -14,10 +17,12 @@ body {
   overflow-x: hidden;
 }
 
-/* Scanline */
+/* Scanline effect */
 body::after {
   content: "";
   position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   background: repeating-linear-gradient(
@@ -30,17 +35,21 @@ body::after {
   pointer-events: none;
 }
 
-/* Boot Screen */
+/* BOOT SCREEN */
 #boot {
   position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   background: black;
+  color: #00ff99;
   display: flex;
-  justify-content: center;
   align-items: center;
-  flex-direction: column;
+  justify-content: center;
+  font-size: 18px;
   z-index: 9999;
+  flex-direction: column;
 }
 
 .fade-out {
@@ -48,20 +57,36 @@ body::after {
 }
 
 @keyframes fadeOut {
-  to { opacity: 0; visibility: hidden; }
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
 }
 
-.container { padding: 25px; }
+.clock {
+  position: fixed;
+  top: 15px;
+  right: 20px;
+  font-size: 14px;
+  color: #00ffaa;
+}
+
+.container {
+  padding: 25px;
+}
 
 .title {
   font-size: 20px;
   margin-bottom: 25px;
-  white-space: nowrap;
-  border-right: 2px solid #00ff99;
-  overflow: hidden;
 }
 
-.bar-section { margin-bottom: 20px; }
+.bar-section {
+  margin-bottom: 20px;
+}
+
+.label {
+  margin-bottom: 5px;
+}
 
 .bar {
   height: 18px;
@@ -76,39 +101,47 @@ body::after {
   transition: width 0.6s ease;
 }
 
-.clock {
-  position: fixed;
-  top: 15px;
-  right: 20px;
-  font-size: 14px;
+.links {
+  margin-top: 40px;
 }
 
-.links { margin-top: 40px; }
+.links div {
+  margin-bottom: 10px;
+  color: #00ffaa;
+}
 
 .links a {
   display: block;
   color: #00ff99;
   text-decoration: none;
-  margin: 6px 0;
+  margin: 8px 0;
+  position: relative;
+  transition: 0.3s ease;
+  padding-left: 12px;
 }
 
-.terminal {
-  margin-top: 40px;
+.links a:hover {
+  color: white;
+  padding-left: 22px;
+  text-shadow: 0 0 8px #00ff99;
 }
 
-input {
-  background: black;
-  border: none;
-  color: #00ff99;
-  font-family: monospace;
-  outline: none;
-  width: 70%;
+.links a::before {
+  content: ">";
+  position: absolute;
+  left: 0;
+  opacity: 0;
+  transition: 0.3s;
+}
+
+.links a:hover::before {
+  opacity: 1;
 }
 </style>
 </head>
 <body>
 
-<!-- Boot -->
+<!-- BOOT SCREEN -->
 <div id="boot">
   <div id="boot-text"></div>
 </div>
@@ -116,130 +149,87 @@ input {
 <div class="clock" id="clock"></div>
 
 <div class="container">
-  <div class="title" id="typed-title"></div>
+  <div class="title">Riza Fauji - System Status</div>
 
   <div class="bar-section">
-    <div>Frontend Development</div>
+    <div class="label">Frontend Development</div>
     <div class="bar"><div class="fill" id="frontend"></div></div>
   </div>
 
   <div class="bar-section">
-    <div>Backend Development</div>
+    <div class="label">Backend Development</div>
     <div class="bar"><div class="fill" id="backend"></div></div>
   </div>
 
   <div class="bar-section">
-    <div>Problem Solving</div>
+    <div class="label">Problem Solving</div>
     <div class="bar"><div class="fill" id="problem"></div></div>
   </div>
 
   <div class="links">
-    <div>user@riza:~$ quick-links</div>
+    <div>user@riza:~$ contact</div>
 
-    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=rizafauji7@gmail.com" target="_blank">[MAIL] Email</a>
-    <a href="https://linkedin.com/in/riza221" target="_blank">[NET ] LinkedIn</a>
-    <a href="https://wa.me/6282132746345" target="_blank">[MSG ] WhatsApp</a>
-  </div>
+    <!-- FIXED EMAIL LINK -->
+    <a href="https://accounts.google.com/ServiceLogin?continue=https://mail.google.com/mail/?view=cm&fs=1&to=rizafauji7@gmail.com"
+       target="_blank"
+       rel="noopener noreferrer">
+       ├── [MAIL] Email
+    </a>
 
-  <!-- Terminal -->
-  <div class="terminal">
-    <div id="terminal-output"></div>
-    <div>
-      user@riza:~$ <input type="text" id="terminal-input" autofocus>
-    </div>
+    <a href="https://linkedin.com/in/riza221" target="_blank">├── [NET ] LinkedIn</a>
+    <a href="https://wa.me/6282132746345" target="_blank">├── [MSG ] WhatsApp</a>
+    <a href="https://t.me/rizax_fauz" target="_blank">├── [TG  ] Telegram</a>
+    <a href="https://medium.com/@rizafauziaja" target="_blank">├── [DOC ] Medium</a>
+    <a href="https://farcaster.xyz/riza221" target="_blank">└── [SOC ] Farcaster</a>
   </div>
 </div>
 
 <script>
-/* BOOT */
 const bootLines = [
   "Initializing system...",
   "Loading modules...",
   "Access granted."
 ];
 
-let index = 0;
 const bootText = document.getElementById("boot-text");
+let lineIndex = 0;
 
-function showBoot() {
-  if(index < bootLines.length){
+function showBootLine() {
+  if (lineIndex < bootLines.length) {
     const p = document.createElement("div");
-    p.textContent = bootLines[index];
+    p.textContent = bootLines[lineIndex];
     bootText.appendChild(p);
-    index++;
-    setTimeout(showBoot, 700);
+    lineIndex++;
+    setTimeout(showBootLine, 800);
   } else {
-    // Beep Sound
-    const audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
-    audio.volume = 0.2;
-    audio.play();
-
     setTimeout(() => {
       document.getElementById("boot").classList.add("fade-out");
-      typeTitle();
     }, 800);
   }
 }
-window.onload = showBoot;
 
-/* Typing Title */
-const titleText = "Riza Fauji - System Status";
-const typedTitle = document.getElementById("typed-title");
-let charIndex = 0;
+window.onload = showBootLine;
 
-function typeTitle(){
-  if(charIndex < titleText.length){
-    typedTitle.textContent += titleText.charAt(charIndex);
-    charIndex++;
-    setTimeout(typeTitle, 60);
-  }
-}
-
-/* Bars */
 function animateBar(id, min, max) {
   const el = document.getElementById(id);
   setInterval(() => {
-    el.style.width = Math.floor(Math.random()*(max-min)+min)+"%";
-  },1500);
+    const value = Math.floor(Math.random() * (max - min)) + min;
+    el.style.width = value + "%";
+  }, 1500);
 }
 
-animateBar("frontend",75,95);
-animateBar("backend",65,85);
-animateBar("problem",80,98);
+animateBar("frontend", 75, 95);
+animateBar("backend", 65, 85);
+animateBar("problem", 80, 98);
 
-/* Clock */
-function updateClock(){
+function updateClock() {
+  const now = new Date();
   document.getElementById("clock").textContent =
-    "Local Time: " + new Date().toLocaleTimeString();
+    "Local Time: " + now.toLocaleTimeString();
 }
-setInterval(updateClock,1000);
+
+setInterval(updateClock, 1000);
 updateClock();
-
-/* Terminal Commands */
-const input = document.getElementById("terminal-input");
-const output = document.getElementById("terminal-output");
-
-const commands = {
-  help: "Available commands: help, about, projects, contact",
-  about: "Riza Fauji - Frontend & Backend Developer.",
-  projects: "Project list coming soon...",
-  contact: "Email: rizafauji7@gmail.com"
-};
-
-input.addEventListener("keydown", function(e){
-  if(e.key === "Enter"){
-    const value = input.value.trim();
-    const line = document.createElement("div");
-    line.textContent = "user@riza:~$ " + value;
-    output.appendChild(line);
-
-    const response = document.createElement("div");
-    response.textContent = commands[value] || "Command not found.";
-    output.appendChild(response);
-
-    input.value = "";
-  }
-});
 </script>
 
 </body>
