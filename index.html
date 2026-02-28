@@ -33,10 +33,14 @@ body::after{
   right:20px;
   font-size:14px;
 }
-.container{ padding:25px; }
+.container{
+  padding:25px;
+  max-width:900px;
+  margin:auto;
+}
 .title{ font-size:20px; margin-bottom:25px; }
 .bar{ height:18px; background:#002b1a; border:1px solid #00ff99; }
-.fill{ height:100%; width:80%; background:#00ff99; }
+.fill{ height:100%; background:#00ff99; }
 
 .terminal{
   margin-top:40px;
@@ -150,6 +154,7 @@ const output=document.getElementById("output");
 const gameBox=document.getElementById("gameBox");
 
 const commands={
+
 help:"Available: help, about, projects, contact, email, linkedin, whatsapp, telegram, medium, farcaster, clear, dino",
 
 about:"Riza Fauji - Developer focused on frontend & backend systems.",
@@ -158,26 +163,25 @@ projects:"1. Terminal Portfolio\n2. System Monitor UI\n3. Web Experiments",
 
 contact:
 `┌─ Contact List
-├─ email
-├─ linkedin
-├─ whatsapp
-├─ telegram
-├─ medium
-├─ farcaster
-├─ clear
-└─ dino`,
+├─ <a href="https://mail.google.com/mail/u/0/?tf=cm&fs=1&to=rizafauji7@gmail.com" target="_blank">Email</a>
+├─ <a href="https://www.linkedin.com/in/riza221/" target="_blank">LinkedIn</a>
+├─ <a href="https://wa.me/6282132746345" target="_blank">WhatsApp</a>
+├─ <a href="https://t.me/rizax_fauz" target="_blank">Telegram</a>
+├─ <a href="https://medium.com/@rizafauziaja" target="_blank">Medium</a>
+├─ <a href="https://farcaster.xyz/riza221" target="_blank">Farcaster</a>
+└─ dino (play game)`,
 
-email:`<a href="mailto:rizafauji7@gmail.com" target="_blank">Send Email</a>`,
+email:`<a href="https://mail.google.com/mail/u/0/?tf=cm&fs=1&to=rizafauji7@gmail.com" target="_blank">Open Gmail</a>`,
 
-linkedin:`<a href="https://www.linkedin.com/in/riza221/" target="_blank">LinkedIn Profile</a>`,
+linkedin:`<a href="https://www.linkedin.com/in/riza221/" target="_blank">Open LinkedIn</a>`,
 
-whatsapp:`<a href="https://wa.me/6282132746345" target="_blank">Chat WhatsApp</a>`,
+whatsapp:`<a href="https://wa.me/6282132746345" target="_blank">Open WhatsApp</a>`,
 
-telegram:`<a href="https://t.me/rizax_fauz" target="_blank">Telegram @rizax_fauz</a>`,
+telegram:`<a href="https://t.me/rizax_fauz" target="_blank">Open Telegram</a>`,
 
-medium:`<a href="https://medium.com/@rizafauziaja" target="_blank">Medium Profile</a>`,
+medium:`<a href="https://medium.com/@rizafauziaja" target="_blank">Open Medium</a>`,
 
-farcaster:`<a href="https://farcaster.xyz/riza221" target="_blank">Farcaster Profile</a>`
+farcaster:`<a href="https://farcaster.xyz/riza221" target="_blank">Open Farcaster</a>`
 };
 
 input.addEventListener("keydown",function(e){
