@@ -13,6 +13,39 @@ body{
   font-family:monospace;
   overflow-x:hidden;
 }
+
+/* BOOTSCREEN */
+#bootScreen{
+  position:fixed;
+  inset:0;
+  background:black;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  z-index:9999;
+}
+#bootText{
+  white-space:pre-line;
+  text-align:center;
+}
+.countdown{
+  font-size:60px;
+  margin-top:20px;
+  animation:pulse 0.6s infinite alternate;
+}
+@keyframes pulse{
+  from{ transform:scale(1); text-shadow:0 0 10px #00ff99; }
+  to{ transform:scale(1.3); text-shadow:0 0 25px #00ff99; }
+}
+.fadeOut{
+  animation:fadeOut 1s forwards;
+}
+@keyframes fadeOut{
+  to{opacity:0;visibility:hidden;}
+}
+
+/* scanline */
 body::after{
   content:"";
   position:fixed;
@@ -27,6 +60,7 @@ body::after{
   );
   pointer-events:none;
 }
+
 .clock{
   position:fixed;
   top:15px;
@@ -39,16 +73,31 @@ body::after{
   margin:auto;
 }
 .title{ font-size:20px; margin-bottom:25px; }
-.bar{ height:18px; background:#002b1a; border:1px solid #00ff99; margin-bottom:10px; }
-.fill{ height:100%; background:#00ff99; }
+
+.bar{
+  height:18px;
+  background:#002b1a;
+  border:1px solid #00ff99;
+  margin-bottom:10px;
+  overflow:hidden;
+}
+.fill{
+  height:100%;
+  background:#00ff99;
+  animation:breath 3s infinite ease-in-out;
+}
+@keyframes breath{
+  0%{ width:85%; }
+  50%{ width:95%; }
+  100%{ width:85%; }
+}
 
 a{
   color:#00ff99;
   text-decoration:none;
+  cursor:pointer;
 }
-a:hover{
-  color:white;
-}
+a:hover{ color:white; }
 
 .terminal{
   margin-top:30px;
@@ -64,7 +113,7 @@ input{
   width:80%;
 }
 
-/* DINO GAME */
+/* DINO */
 #gameBox{
   margin-top:20px;
   border:1px solid #00ff99;
@@ -100,19 +149,24 @@ input{
 </head>
 <body>
 
+<div id="bootScreen">
+  <div id="bootText"></div>
+  <div id="countdown" class="countdown"></div>
+</div>
+
 <div class="clock" id="clock"></div>
 
 <div class="container">
 <div class="title">Riza Fauji - System Status</div>
 
 Frontend Development
-<div class="bar"><div class="fill" style="width:90%"></div></div>
+<div class="bar"><div class="fill"></div></div>
 
 Backend Development
-<div class="bar"><div class="fill" style="width:80%"></div></div>
+<div class="bar"><div class="fill"></div></div>
 
 Problem Solving
-<div class="bar"><div class="fill" style="width:95%"></div></div>
+<div class="bar"><div class="fill"></div></div>
 
 <div style="margin-top:25px;">
 user@riza:~$ whoami<br>
@@ -120,7 +174,6 @@ IP: <span id="ip">Detecting...</span><br>
 Visits: <span id="visits">Loading...</span>
 </div>
 
-<!-- CONTACT AUTO SHOW -->
 <div style="margin-top:25px;">
 user@riza:~$ contact<br>
 ┌─ Contact List<br>
@@ -130,7 +183,7 @@ user@riza:~$ contact<br>
 ├─ <a href="https://t.me/rizax_fauz" target="_blank">Telegram</a><br>
 ├─ <a href="https://medium.com/@rizafauziaja" target="_blank">Medium</a><br>
 ├─ <a href="https://farcaster.xyz/riza221" target="_blank">Farcaster</a><br>
-└─ dino (play game)
+└─ <a onclick="startGame()">dino (play game)</a>
 </div>
 
 <div class="terminal">
@@ -146,6 +199,41 @@ user@riza:~$ contact<br>
 </div>
 
 <script>
+
+/* BOOT ANIMATION */
+const bootText=document.getElementById("bootText");
+const countdownEl=document.getElementById("countdown");
+const bootScreen=document.getElementById("bootScreen");
+
+const lines=["Initializing system...","Loading modules...","Boot sequence..."];
+let i=0;
+
+function bootLines(){
+if(i<lines.length){
+bootText.textContent+=lines[i]+"\n";
+i++;
+setTimeout(bootLines,600);
+}else{
+startCountdown();
+}
+}
+
+function startCountdown(){
+let count=5;
+countdownEl.textContent=count;
+let interval=setInterval(()=>{
+count--;
+if(count>0){
+countdownEl.textContent=count;
+}else{
+clearInterval(interval);
+countdownEl.textContent="ACCESS GRANTED";
+setTimeout(()=>bootScreen.classList.add("fadeOut"),1000);
+}
+},800);
+}
+
+window.addEventListener("load",bootLines);
 
 /* CLOCK */
 function updateClock(){
@@ -167,52 +255,32 @@ fetch("https://api.countapi.xyz/hit/rizafauji.dev/visits")
 .then(data=>document.getElementById("visits").textContent=data.value)
 .catch(()=>document.getElementById("visits").textContent="Error");
 
-/* TERMINAL COMMAND */
+/* TERMINAL */
 const input=document.getElementById("command");
 const output=document.getElementById("output");
 const gameBox=document.getElementById("gameBox");
 
-const commands={
-help:"Available: help, about, projects, clear, dino",
-about:"Riza Fauji - Developer focused on frontend & backend systems.",
-projects:"1. Terminal Portfolio\n2. System Monitor UI\n3. Web Experiments"
-};
-
 input.addEventListener("keydown",function(e){
 if(e.key==="Enter"){
 const cmd=input.value.trim().toLowerCase();
-
 const line=document.createElement("div");
 line.textContent="user@riza:~$ "+cmd;
 output.appendChild(line);
 
-if(cmd==="dino"){
-gameBox.style.display="block";
-startGame();
-}
-else if(cmd==="clear"){
-output.innerHTML="";
-}
-else{
-const res=document.createElement("div");
-res.textContent=commands[cmd]||"Command not found.";
-output.appendChild(res);
-}
+if(cmd==="dino") startGame();
+else if(cmd==="clear") output.innerHTML="";
+else output.innerHTML+="<div>Command not found.</div>";
 
 input.value="";
 }
 });
 
-/* DINO GAME */
+/* DINO */
 const dino=document.getElementById("dino");
 const cactus=document.getElementById("cactus");
 const scoreEl=document.getElementById("score");
 
-let jumping=false;
-let score=0;
-let speed=5;
-let gameInterval;
-let scoreInterval;
+let jumping=false,score=0,speed=5,gameInterval,scoreInterval;
 
 function jump(){
 if(jumping)return;
@@ -240,6 +308,7 @@ if(e.code==="Escape") stopGame();
 });
 
 function startGame(){
+gameBox.style.display="block";
 score=0;
 scoreEl.textContent="Score: 0";
 cactus.style.right="-20px";
@@ -247,7 +316,6 @@ cactus.style.right="-20px";
 gameInterval=setInterval(()=>{
 let cactusLeft=parseInt(window.getComputedStyle(cactus).getPropertyValue("right"));
 cactus.style.right=(cactusLeft+speed)+"px";
-
 let dinoBottom=parseInt(window.getComputedStyle(dino).getPropertyValue("bottom"));
 if(cactusLeft>540 && cactusLeft<580 && dinoBottom<20){
 alert("GAME OVER");
@@ -267,7 +335,7 @@ clearInterval(gameInterval);
 clearInterval(scoreInterval);
 gameBox.style.display="none";
 }
-
 </script>
+
 </body>
 </html>
