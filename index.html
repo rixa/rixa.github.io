@@ -11,42 +11,6 @@ body {
   background: black;
   color: #00ff99;
   font-family: monospace;
-  overflow-x: hidden;
-}
-
-body::after {
-  content: "";
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(0,255,153,0.03),
-    rgba(0,255,153,0.03) 1px,
-    transparent 1px,
-    transparent 3px
-  );
-  pointer-events: none;
-}
-
-#boot {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background: black;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  z-index: 9999;
-}
-
-.fade-out {
-  animation: fadeOut 1s forwards;
-}
-
-@keyframes fadeOut {
-  to { opacity: 0; visibility: hidden; }
 }
 
 .clock {
@@ -56,9 +20,7 @@ body::after {
   font-size: 14px;
 }
 
-.container {
-  padding: 25px;
-}
+.container { padding: 25px; }
 
 .title {
   font-size: 20px;
@@ -81,15 +43,29 @@ body::after {
   transition: width 0.6s ease;
 }
 
+.links {
+  margin-top: 30px;
+}
+
+.links a {
+  display: block;
+  color: #00ff99;
+  text-decoration: none;
+  margin: 6px 0;
+}
+
+.links a:hover {
+  color: white;
+  padding-left: 10px;
+}
+
 .terminal {
   margin-top: 40px;
   border-top: 1px solid #00ff99;
   padding-top: 15px;
 }
 
-#output div {
-  margin-bottom: 4px;
-}
+#output div { margin-bottom: 4px; }
 
 input {
   background: black;
@@ -103,15 +79,13 @@ input {
 </head>
 <body>
 
-<div id="boot">
-  <div id="boot-text"></div>
-</div>
-
 <div class="clock" id="clock"></div>
 
 <div class="container">
+
   <div class="title" id="typing-title"></div>
 
+  <!-- SKILLS -->
   <div class="bar-section">
     Frontend Development
     <div class="bar"><div class="fill" id="frontend"></div></div>
@@ -127,14 +101,23 @@ input {
     <div class="bar"><div class="fill" id="problem"></div></div>
   </div>
 
-  <!-- REAL VISITOR INFO -->
+  <!-- REAL VISITOR -->
   <div style="margin-top:30px;">
     user@riza:~$ whoami<br>
     IP: <span id="ip">Detecting...</span><br>
     Visits: <span id="visits">Loading...</span>
   </div>
 
-  <!-- INTERACTIVE TERMINAL -->
+  <!-- CONTACT SECTION (BIAR AWAM GAK BINGUNG) -->
+  <div class="links">
+    <div>user@riza:~$ contact</div>
+    <a href="mailto:rizafauji7@gmail.com">├── Email</a>
+    <a href="https://linkedin.com/in/riza221" target="_blank">├── LinkedIn</a>
+    <a href="https://wa.me/6282132746345" target="_blank">├── WhatsApp</a>
+    <a href="https://t.me/rizax_fauz" target="_blank">└── Telegram</a>
+  </div>
+
+  <!-- TERMINAL -->
   <div class="terminal">
     <div id="output"></div>
     <div>user@riza:~$ <input id="command" autofocus></div>
@@ -143,31 +126,6 @@ input {
 </div>
 
 <script>
-
-/* BOOT */
-const bootLines = [
-  "Initializing system...",
-  "Loading modules...",
-  "Access granted."
-];
-
-let lineIndex = 0;
-const bootText = document.getElementById("boot-text");
-
-function showBootLine() {
-  if (lineIndex < bootLines.length) {
-    const p = document.createElement("div");
-    p.textContent = bootLines[lineIndex];
-    bootText.appendChild(p);
-    lineIndex++;
-    setTimeout(showBootLine, 800);
-  } else {
-    setTimeout(() => {
-      document.getElementById("boot").classList.add("fade-out");
-    }, 800);
-  }
-}
-window.onload = showBootLine;
 
 /* TYPING TITLE */
 const titleText = "Riza Fauji - System Status";
@@ -179,7 +137,7 @@ function typeTitle() {
     setTimeout(typeTitle, 80);
   }
 }
-setTimeout(typeTitle, 2500);
+typeTitle();
 
 /* SKILL BARS */
 function animateBar(id, min, max) {
@@ -211,8 +169,8 @@ fetch("https://api.ipify.org?format=json")
     document.getElementById("ip").textContent = "Unavailable";
   });
 
-/* REAL VISITOR COUNTER */
-fetch("https://api.countapi.xyz/hit/rizafauji.dev/visits")
+/* VISITOR COUNTER FIX */
+fetch("https://api.countapi.xyz/hit/rizafauji221/system")
   .then(res => res.json())
   .then(data => {
     document.getElementById("visits").textContent = data.value;
@@ -226,10 +184,11 @@ const input = document.getElementById("command");
 const output = document.getElementById("output");
 
 const commands = {
-  help: "Available commands: help, about, projects, contact",
-  about: "Riza Fauji - Developer focused on frontend & backend systems.",
-  projects: "1. Terminal Portfolio\n2. System Monitor UI\n3. Web Experiments",
-  contact: "Email: rizafauji7@gmail.com"
+  help: "Commands: help, about, projects, contact, clear",
+  about: "Riza Fauji - Web Developer with terminal-style creativity.",
+  projects: "1. Terminal Portfolio\n2. System Monitor UI\n3. Experimental Web",
+  contact: "Email: rizafauji7@gmail.com\nLinkedIn: linkedin.com/in/riza221",
+  clear: "clear"
 };
 
 input.addEventListener("keydown", function(e) {
@@ -239,9 +198,13 @@ input.addEventListener("keydown", function(e) {
     line.textContent = "user@riza:~$ " + cmd;
     output.appendChild(line);
 
-    const response = document.createElement("div");
-    response.textContent = commands[cmd] || "Command not found.";
-    output.appendChild(response);
+    if (cmd === "clear") {
+      output.innerHTML = "";
+    } else {
+      const response = document.createElement("div");
+      response.textContent = commands[cmd] || "Command not found.";
+      output.appendChild(response);
+    }
 
     input.value = "";
   }
