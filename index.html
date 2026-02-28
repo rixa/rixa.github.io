@@ -1,216 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Riza Fauji | System Monitor</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- CONTACT SECTION -->
+<div class="links">
+  <div>user@riza:~$ contact</div>
 
-<style>
-body {
-  margin: 0;
-  background: black;
-  color: #00ff99;
-  font-family: monospace;
-}
+  <!-- DIRECT GMAIL COMPOSE -->
+  <a href="https://mail.google.com/mail/?view=cm&fs=1&to=rizafauji7@gmail.com"
+     target="_blank">
+     ├── Email (Gmail)
+  </a>
 
-.clock {
-  position: fixed;
-  top: 15px;
-  right: 20px;
-  font-size: 14px;
-}
+  <a href="https://linkedin.com/in/riza221" target="_blank">
+     ├── LinkedIn
+  </a>
 
-.container { padding: 25px; }
+  <a href="https://wa.me/6282132746345" target="_blank">
+     ├── WhatsApp
+  </a>
 
-.title {
-  font-size: 20px;
-  margin-bottom: 25px;
-  height: 24px;
-}
+  <a href="https://t.me/rizax_fauz" target="_blank">
+     ├── Telegram
+  </a>
 
-.bar-section { margin-bottom: 20px; }
+  <a href="https://medium.com/@rizafauziaja" target="_blank">
+     ├── Medium
+  </a>
 
-.bar {
-  height: 18px;
-  background: #002b1a;
-  border: 1px solid #00ff99;
-}
-
-.fill {
-  height: 100%;
-  width: 0%;
-  background: #00ff99;
-  transition: width 0.6s ease;
-}
-
-.links {
-  margin-top: 30px;
-}
-
-.links a {
-  display: block;
-  color: #00ff99;
-  text-decoration: none;
-  margin: 6px 0;
-}
-
-.links a:hover {
-  color: white;
-  padding-left: 10px;
-}
-
-.terminal {
-  margin-top: 40px;
-  border-top: 1px solid #00ff99;
-  padding-top: 15px;
-}
-
-#output div { margin-bottom: 4px; }
-
-input {
-  background: black;
-  border: none;
-  color: #00ff99;
-  font-family: monospace;
-  outline: none;
-  width: 80%;
-}
-</style>
-</head>
-<body>
-
-<div class="clock" id="clock"></div>
-
-<div class="container">
-
-  <div class="title" id="typing-title"></div>
-
-  <!-- SKILLS -->
-  <div class="bar-section">
-    Frontend Development
-    <div class="bar"><div class="fill" id="frontend"></div></div>
-  </div>
-
-  <div class="bar-section">
-    Backend Development
-    <div class="bar"><div class="fill" id="backend"></div></div>
-  </div>
-
-  <div class="bar-section">
-    Problem Solving
-    <div class="bar"><div class="fill" id="problem"></div></div>
-  </div>
-
-  <!-- REAL VISITOR -->
-  <div style="margin-top:30px;">
-    user@riza:~$ whoami<br>
-    IP: <span id="ip">Detecting...</span><br>
-    Visits: <span id="visits">Loading...</span>
-  </div>
-
-  <!-- CONTACT SECTION (BIAR AWAM GAK BINGUNG) -->
-  <div class="links">
-    <div>user@riza:~$ contact</div>
-    <a href="mailto:rizafauji7@gmail.com">├── Email</a>
-    <a href="https://linkedin.com/in/riza221" target="_blank">├── LinkedIn</a>
-    <a href="https://wa.me/6282132746345" target="_blank">├── WhatsApp</a>
-    <a href="https://t.me/rizax_fauz" target="_blank">└── Telegram</a>
-  </div>
-
-  <!-- TERMINAL -->
-  <div class="terminal">
-    <div id="output"></div>
-    <div>user@riza:~$ <input id="command" autofocus></div>
-  </div>
-
+  <a href="https://farcaster.xyz/riza221" target="_blank">
+     └── Farcaster
+  </a>
 </div>
-
-<script>
-
-/* TYPING TITLE */
-const titleText = "Riza Fauji - System Status";
-let i = 0;
-function typeTitle() {
-  if (i < titleText.length) {
-    document.getElementById("typing-title").textContent += titleText.charAt(i);
-    i++;
-    setTimeout(typeTitle, 80);
-  }
-}
-typeTitle();
-
-/* SKILL BARS */
-function animateBar(id, min, max) {
-  const el = document.getElementById(id);
-  setInterval(() => {
-    const value = Math.floor(Math.random() * (max - min)) + min;
-    el.style.width = value + "%";
-  }, 1500);
-}
-animateBar("frontend", 75, 95);
-animateBar("backend", 65, 85);
-animateBar("problem", 80, 98);
-
-/* CLOCK */
-function updateClock() {
-  document.getElementById("clock").textContent =
-    "Local Time: " + new Date().toLocaleTimeString();
-}
-setInterval(updateClock, 1000);
-updateClock();
-
-/* REAL IP */
-fetch("https://api.ipify.org?format=json")
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById("ip").textContent = data.ip;
-  })
-  .catch(() => {
-    document.getElementById("ip").textContent = "Unavailable";
-  });
-
-/* VISITOR COUNTER FIX */
-fetch("https://api.countapi.xyz/hit/rizafauji221/system")
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById("visits").textContent = data.value;
-  })
-  .catch(() => {
-    document.getElementById("visits").textContent = "Error";
-  });
-
-/* TERMINAL COMMANDS */
-const input = document.getElementById("command");
-const output = document.getElementById("output");
-
-const commands = {
-  help: "Commands: help, about, projects, contact, clear",
-  about: "Riza Fauji - Web Developer with terminal-style creativity.",
-  projects: "1. Terminal Portfolio\n2. System Monitor UI\n3. Experimental Web",
-  contact: "Email: rizafauji7@gmail.com\nLinkedIn: linkedin.com/in/riza221",
-  clear: "clear"
-};
-
-input.addEventListener("keydown", function(e) {
-  if (e.key === "Enter") {
-    const cmd = input.value.trim();
-    const line = document.createElement("div");
-    line.textContent = "user@riza:~$ " + cmd;
-    output.appendChild(line);
-
-    if (cmd === "clear") {
-      output.innerHTML = "";
-    } else {
-      const response = document.createElement("div");
-      response.textContent = commands[cmd] || "Command not found.";
-      output.appendChild(response);
-    }
-
-    input.value = "";
-  }
-});
-
-</script>
-
-</body>
-</html>
