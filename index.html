@@ -51,6 +51,7 @@ input{
   outline:none;
   width:80%;
 }
+a{ color:#00ff99; }
 
 /* DINO GAME */
 #gameBox{
@@ -105,8 +106,7 @@ Problem Solving
 <div style="margin-top:30px;">
 user@riza:~$ whoami<br>
 IP: <span id="ip">Detecting...</span><br>
-Visits: <span id="visits">Loading...</span><br>
-Email: rizafauji7@gmail.com
+Visits: <span id="visits">Loading...</span>
 </div>
 
 <div class="terminal">
@@ -150,15 +150,39 @@ const output=document.getElementById("output");
 const gameBox=document.getElementById("gameBox");
 
 const commands={
-help:"Available: help, about, projects, contact, dino",
+help:"Available: help, about, projects, contact, email, linkedin, whatsapp, telegram, medium, farcaster, clear, dino",
+
 about:"Riza Fauji - Developer focused on frontend & backend systems.",
+
 projects:"1. Terminal Portfolio\n2. System Monitor UI\n3. Web Experiments",
-contact:"Email: rizafauji7@gmail.com"
+
+contact:
+`┌─ Contact List
+├─ email
+├─ linkedin
+├─ whatsapp
+├─ telegram
+├─ medium
+├─ farcaster
+├─ clear
+└─ dino`,
+
+email:`<a href="mailto:rizafauji7@gmail.com" target="_blank">Send Email</a>`,
+
+linkedin:`<a href="https://www.linkedin.com/in/riza221/" target="_blank">LinkedIn Profile</a>`,
+
+whatsapp:`<a href="https://wa.me/6282132746345" target="_blank">Chat WhatsApp</a>`,
+
+telegram:`<a href="https://t.me/rizax_fauz" target="_blank">Telegram @rizax_fauz</a>`,
+
+medium:`<a href="https://medium.com/@rizafauziaja" target="_blank">Medium Profile</a>`,
+
+farcaster:`<a href="https://farcaster.xyz/riza221" target="_blank">Farcaster Profile</a>`
 };
 
 input.addEventListener("keydown",function(e){
 if(e.key==="Enter"){
-const cmd=input.value.trim();
+const cmd=input.value.trim().toLowerCase();
 const line=document.createElement("div");
 line.textContent="user@riza:~$ "+cmd;
 output.appendChild(line);
@@ -166,11 +190,16 @@ output.appendChild(line);
 if(cmd==="dino"){
 gameBox.style.display="block";
 startGame();
-}else{
+}
+else if(cmd==="clear"){
+output.innerHTML="";
+}
+else{
 const res=document.createElement("div");
-res.textContent=commands[cmd]||"Command not found.";
+res.innerHTML=commands[cmd]||"Command not found.";
 output.appendChild(res);
 }
+
 input.value="";
 }
 });
@@ -191,7 +220,8 @@ if(jumping)return;
 jumping=true;
 let up=0;
 let jumpUp=setInterval(()=>{
-if(up>=60){clearInterval(jumpUp);
+if(up>=60){
+clearInterval(jumpUp);
 let down=setInterval(()=>{
 if(up<=0){clearInterval(down);jumping=false;}
 up-=5;
