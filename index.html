@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Riza Fauji | System Monitor</title>
+<title>Riza Fauji | Portfolio System</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -28,9 +28,10 @@ body{
 
 .title{
   font-size:22px;
-  margin-bottom:25px;
+  margin-bottom:20px;
 }
 
+/* SKILL BARS */
 .stat{ margin-bottom:15px; }
 
 .bar{
@@ -38,14 +39,11 @@ body{
   background:#002b1a;
   border:1px solid #00ff99;
   position:relative;
-  overflow:hidden;
 }
 
 .fill{
   height:100%;
-  width:0%;
   background:#00ff99;
-  transition:width 0.5s linear;
 }
 
 .percent{
@@ -55,6 +53,21 @@ body{
   font-size:12px;
 }
 
+/* CONTACT */
+.contact{
+  margin-top:25px;
+  border-top:1px solid #00ff99;
+  padding-top:15px;
+}
+
+.contact a{
+  color:#00ff99;
+  text-decoration:none;
+}
+
+.contact a:hover{ color:white; }
+
+/* TERMINAL */
 .terminal{
   margin-top:30px;
   border-top:1px solid #00ff99;
@@ -121,9 +134,6 @@ input{
 
 #score{ right:10px; }
 #highscore{ left:10px; }
-
-a{ color:#00ff99; text-decoration:none; }
-a:hover{ color:white; }
 </style>
 </head>
 
@@ -133,29 +143,48 @@ a:hover{ color:white; }
 
 <div class="container">
 
-<div class="title">Riza Fauji | System Monitor</div>
+<div class="title">Riza Fauji | Interactive Portfolio</div>
 
 <div>Public IP: <span id="ip">Loading...</span></div>
-
 <br>
 
-<div class="stat">CPU Core 1<div class="bar"><div class="fill" id="cpu1"></div><div class="percent" id="cpu1p">0%</div></div></div>
-<div class="stat">CPU Core 2<div class="bar"><div class="fill" id="cpu2"></div><div class="percent" id="cpu2p">0%</div></div></div>
-<div class="stat">CPU Core 3<div class="bar"><div class="fill" id="cpu3"></div><div class="percent" id="cpu3p">0%</div></div></div>
-<div class="stat">CPU Core 4<div class="bar"><div class="fill" id="cpu4"></div><div class="percent" id="cpu4p">0%</div></div></div>
+<!-- SKILLS -->
+<div class="stat">Frontend Development
+<div class="bar">
+<div class="fill" style="width:90%"></div>
+<div class="percent">90%</div>
+</div></div>
 
-<div class="stat">RAM Usage<div class="bar"><div class="fill" id="ram"></div><div class="percent" id="ramp">0%</div></div></div>
+<div class="stat">Backend Development
+<div class="bar">
+<div class="fill" style="width:85%"></div>
+<div class="percent">85%</div>
+</div></div>
 
-<div class="stat">Network RX<div class="bar"><div class="fill" id="net"></div><div class="percent" id="netp">0 KB/s</div></div></div>
+<div class="stat">Problem Solving
+<div class="bar">
+<div class="fill" style="width:88%"></div>
+<div class="percent">88%</div>
+</div></div>
 
-<div style="margin-top:15px;">
-Uptime: <span id="uptime">0s</span>
+<div class="stat">System & Automation
+<div class="bar">
+<div class="fill" style="width:80%"></div>
+<div class="percent">80%</div>
+</div></div>
+
+<!-- CONTACT -->
+<div class="contact">
+<div>Contact:</div>
+<div><a href="mailto:rizafauji7@gmail.com">Email</a></div>
+<div><a href="https://linkedin.com/in/riza221" target="_blank">LinkedIn</a></div>
+<div><a href="https://wa.me/6282132746345" target="_blank">WhatsApp</a></div>
+<div><a href="https://t.me/rizax_fauz" target="_blank">Telegram</a></div>
+<div><a href="https://medium.com/@rizafauziaja" target="_blank">Medium</a></div>
+<div><a href="https://farcaster.xyz/riza221" target="_blank">Farcaster</a></div>
 </div>
 
-<div style="margin-top:20px;">
-Visits: <span id="visits">0</span>
-</div>
-
+<!-- TERMINAL -->
 <div class="terminal">
 <div id="output"></div>
 <div>user@riza:~$ <input id="command"><span class="cursor"></span></div>
@@ -166,8 +195,8 @@ Visits: <span id="visits">0</span>
 <div id="dino"></div>
 <div id="cactus"></div>
 </div>
-
 </div>
+
 </div>
 
 <script>
@@ -178,50 +207,12 @@ document.getElementById("clock").textContent=
 "Local Time: "+new Date().toLocaleTimeString();
 },1000);
 
-/* PUBLIC IP */
+/* IP */
 fetch("https://api.ipify.org?format=json")
 .then(res=>res.json())
 .then(data=>{
 document.getElementById("ip").textContent=data.ip;
-})
-.catch(()=>{
-document.getElementById("ip").textContent="Unavailable";
 });
-
-/* SYSTEM STATS */
-function randomStat(id,pid){
-let val=Math.floor(Math.random()*100);
-document.getElementById(id).style.width=val+"%";
-document.getElementById(pid).textContent=val+"%";
-}
-
-setInterval(()=>{
-randomStat("cpu1","cpu1p");
-randomStat("cpu2","cpu2p");
-randomStat("cpu3","cpu3p");
-randomStat("cpu4","cpu4p");
-randomStat("ram","ramp");
-
-let net=Math.floor(Math.random()*900);
-document.getElementById("net").style.width=(net/10)+"%";
-document.getElementById("netp").textContent=net+" KB/s";
-},1000);
-
-/* UPTIME */
-let sec=0;
-setInterval(()=>{
-sec++;
-let h=Math.floor(sec/3600);
-let m=Math.floor((sec%3600)/60);
-let s=sec%60;
-document.getElementById("uptime").textContent=h+"h "+m+"m "+s+"s";
-},1000);
-
-/* VISITS */
-let visits=localStorage.getItem("riza_visits")||0;
-visits++;
-localStorage.setItem("riza_visits",visits);
-document.getElementById("visits").textContent=visits;
 
 /* TERMINAL */
 const input=document.getElementById("command");
@@ -237,7 +228,7 @@ switch(cmd){
 
 case "help":
 output.innerHTML+=`
-<div>Available commands:</div>
+<div>Available:</div>
 <div>email</div>
 <div>linkedin</div>
 <div>whatsapp</div>
@@ -246,36 +237,31 @@ output.innerHTML+=`
 <div>farcaster</div>
 <div>dino</div>
 <div>clear</div>
-<div>ip</div>
 `;
 break;
 
 case "email":
-window.open("https://mail.google.com/mail/u/0/?tf=cm&fs=1&to=rizafauji7@gmail.com","_blank");
+window.open("mailto:rizafauji7@gmail.com");
 break;
 
 case "linkedin":
-window.open("https://www.linkedin.com/in/riza221/","_blank");
+window.open("https://linkedin.com/in/riza221");
 break;
 
 case "whatsapp":
-window.open("https://wa.me/6282132746345","_blank");
+window.open("https://wa.me/6282132746345");
 break;
 
 case "telegram":
-window.open("https://t.me/rizax_fauz","_blank");
+window.open("https://t.me/rizax_fauz");
 break;
 
 case "medium":
-window.open("https://medium.com/@rizafauziaja","_blank");
+window.open("https://medium.com/@rizafauziaja");
 break;
 
 case "farcaster":
-window.open("https://farcaster.xyz/riza221","_blank");
-break;
-
-case "ip":
-output.innerHTML+="<div>"+document.getElementById("ip").textContent+"</div>";
+window.open("https://farcaster.xyz/riza221");
 break;
 
 case "clear":
@@ -292,7 +278,7 @@ output.innerHTML+="<div>Command not found</div>";
 }
 });
 
-/* DINO GAME */
+/* DINO */
 const gameBox=document.getElementById("gameBox");
 const dino=document.getElementById("dino");
 const cactus=document.getElementById("cactus");
