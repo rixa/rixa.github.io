@@ -41,31 +41,12 @@ body::after {
   z-index: 9999;
 }
 
-.fade-out {
-  animation: fadeOut 1s forwards;
-}
+.fade-out { animation: fadeOut 1s forwards; }
+@keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
 
-@keyframes fadeOut {
-  to { opacity: 0; visibility: hidden; }
-}
-
-.clock {
-  position: fixed;
-  top: 15px;
-  right: 20px;
-  font-size: 14px;
-}
-
-.container {
-  padding: 25px;
-}
-
-.title {
-  font-size: 20px;
-  margin-bottom: 25px;
-  height: 24px;
-}
-
+.clock { position: fixed; top: 15px; right: 20px; font-size: 14px; }
+.container { padding: 25px; }
+.title { font-size: 20px; margin-bottom: 25px; height: 24px; }
 .bar-section { margin-bottom: 20px; }
 
 .bar {
@@ -87,9 +68,7 @@ body::after {
   padding-top: 15px;
 }
 
-#output div {
-  margin-bottom: 4px;
-}
+#output div { margin-bottom: 4px; }
 
 input {
   background: black;
@@ -103,10 +82,7 @@ input {
 </head>
 <body>
 
-<div id="boot">
-  <div id="boot-text"></div>
-</div>
-
+<div id="boot"><div id="boot-text"></div></div>
 <div class="clock" id="clock"></div>
 
 <div class="container">
@@ -127,126 +103,147 @@ input {
     <div class="bar"><div class="fill" id="problem"></div></div>
   </div>
 
-  <!-- REAL VISITOR INFO -->
   <div style="margin-top:30px;">
     user@riza:~$ whoami<br>
     IP: <span id="ip">Detecting...</span><br>
     Visits: <span id="visits">Loading...</span>
   </div>
 
-  <!-- INTERACTIVE TERMINAL -->
   <div class="terminal">
     <div id="output"></div>
     <div>user@riza:~$ <input id="command" autofocus></div>
   </div>
-
 </div>
 
 <script>
-
 /* BOOT */
-const bootLines = [
-  "Initializing system...",
-  "Loading modules...",
-  "Access granted."
-];
+const bootLines=["Initializing system...","Loading modules...","Access granted."];
+let lineIndex=0;
+const bootText=document.getElementById("boot-text");
+function showBootLine(){
+ if(lineIndex<bootLines.length){
+  const p=document.createElement("div");
+  p.textContent=bootLines[lineIndex];
+  bootText.appendChild(p);
+  lineIndex++;
+  setTimeout(showBootLine,800);
+ }else{
+  setTimeout(()=>{document.getElementById("boot").classList.add("fade-out");},800);
+ }}
+window.onload=showBootLine;
 
-let lineIndex = 0;
-const bootText = document.getElementById("boot-text");
+/* TITLE */
+const titleText="Riza Fauji - System Status";
+let i=0;
+function typeTitle(){
+ if(i<titleText.length){
+  document.getElementById("typing-title").textContent+=titleText.charAt(i);
+  i++;
+  setTimeout(typeTitle,80);
+ }}
+setTimeout(typeTitle,2500);
 
-function showBootLine() {
-  if (lineIndex < bootLines.length) {
-    const p = document.createElement("div");
-    p.textContent = bootLines[lineIndex];
-    bootText.appendChild(p);
-    lineIndex++;
-    setTimeout(showBootLine, 800);
-  } else {
-    setTimeout(() => {
-      document.getElementById("boot").classList.add("fade-out");
-    }, 800);
-  }
+/* BARS */
+function animateBar(id,min,max){
+ const el=document.getElementById(id);
+ setInterval(()=>{
+  const value=Math.floor(Math.random()*(max-min))+min;
+  el.style.width=value+"%";
+ },1500);
 }
-window.onload = showBootLine;
-
-/* TYPING TITLE */
-const titleText = "Riza Fauji - System Status";
-let i = 0;
-function typeTitle() {
-  if (i < titleText.length) {
-    document.getElementById("typing-title").textContent += titleText.charAt(i);
-    i++;
-    setTimeout(typeTitle, 80);
-  }
-}
-setTimeout(typeTitle, 2500);
-
-/* SKILL BARS */
-function animateBar(id, min, max) {
-  const el = document.getElementById(id);
-  setInterval(() => {
-    const value = Math.floor(Math.random() * (max - min)) + min;
-    el.style.width = value + "%";
-  }, 1500);
-}
-animateBar("frontend", 75, 95);
-animateBar("backend", 65, 85);
-animateBar("problem", 80, 98);
+animateBar("frontend",75,95);
+animateBar("backend",65,85);
+animateBar("problem",80,98);
 
 /* CLOCK */
-function updateClock() {
-  document.getElementById("clock").textContent =
-    "Local Time: " + new Date().toLocaleTimeString();
+function updateClock(){
+ document.getElementById("clock").textContent="Local Time: "+new Date().toLocaleTimeString();
 }
-setInterval(updateClock, 1000);
-updateClock();
+setInterval(updateClock,1000);updateClock();
 
-/* REAL IP */
+/* IP */
 fetch("https://api.ipify.org?format=json")
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById("ip").textContent = data.ip;
-  })
-  .catch(() => {
-    document.getElementById("ip").textContent = "Unavailable";
-  });
+.then(res=>res.json())
+.then(data=>{document.getElementById("ip").textContent=data.ip;})
+.catch(()=>{document.getElementById("ip").textContent="Unavailable";});
 
-/* REAL VISITOR COUNTER */
+/* VISITOR */
 fetch("https://api.countapi.xyz/hit/rizafauji.dev/visits")
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById("visits").textContent = data.value;
-  })
-  .catch(() => {
-    document.getElementById("visits").textContent = "Error";
-  });
+.then(res=>res.json())
+.then(data=>{document.getElementById("visits").textContent=data.value;})
+.catch(()=>{document.getElementById("visits").textContent="Error";});
 
-/* TERMINAL COMMANDS */
-const input = document.getElementById("command");
-const output = document.getElementById("output");
+/* TERMINAL */
+const input=document.getElementById("command");
+const output=document.getElementById("output");
 
-const commands = {
-  help: "Available commands: help, about, projects, contact",
-  about: "Riza Fauji - Developer focused on frontend & backend systems.",
-  projects: "1. Terminal Portfolio\n2. System Monitor UI\n3. Web Experiments",
-  contact: "Email: rizafauji7@gmail.com"
+const commands={
+ help:"Available commands: help, about, projects, contact, dino",
+ about:"Riza Fauji - Developer.",
+ projects:"1. Terminal Portfolio\n2. System Monitor UI\n3. Web Experiments",
+ contact:"Email: rizafauji7@gmail.com",
+ dino:"Launching Dino..."
 };
 
-input.addEventListener("keydown", function(e) {
-  if (e.key === "Enter") {
-    const cmd = input.value.trim();
-    const line = document.createElement("div");
-    line.textContent = "user@riza:~$ " + cmd;
-    output.appendChild(line);
+input.addEventListener("keydown",function(e){
+ if(e.key==="Enter"){
+  const cmd=input.value.trim();
+  const line=document.createElement("div");
+  line.textContent="user@riza:~$ "+cmd;
+  output.appendChild(line);
 
-    const response = document.createElement("div");
-    response.textContent = commands[cmd] || "Command not found.";
-    output.appendChild(response);
-
-    input.value = "";
+  if(cmd==="dino"){ startDino(); }
+  else{
+   const response=document.createElement("div");
+   response.textContent=commands[cmd]||"Command not found.";
+   output.appendChild(response);
   }
-});
+  input.value="";
+ }});
 
+/* DINO */
+function startDino(){
+ const wrapper=document.createElement("div");
+ wrapper.innerHTML=`<canvas id="game" width="600" height="180"
+ style="background:black;border:1px solid #00ff99;"></canvas>
+ <div>SPACE = Jump | ESC = Exit</div>`;
+ output.appendChild(wrapper);
+
+ const canvas=document.getElementById("game");
+ const ctx=canvas.getContext("2d");
+
+ let dino={x:50,y:130,w:20,h:20,vy:0,jump:false};
+ let obs={x:600,y:140,w:20,h:20};
+ let gravity=0.6,speed=6,score=0,run=true;
+
+ function draw(){
+  ctx.clearRect(0,0,600,180);
+  ctx.fillStyle="#00ff99";
+  ctx.fillRect(dino.x,dino.y,dino.w,dino.h);
+  ctx.fillRect(obs.x,obs.y,obs.w,obs.h);
+  ctx.fillText("Score: "+score,500,20);
+ }
+
+ function update(){
+  if(!run)return;
+  dino.vy+=gravity;
+  dino.y+=dino.vy;
+  if(dino.y>130){dino.y=130;dino.vy=0;dino.jump=false;}
+  obs.x-=speed;
+  if(obs.x<-20){obs.x=600;score++;speed+=0.2;}
+  if(dino.x<obs.x+obs.w&&dino.x+dino.w>obs.x&&
+     dino.y<obs.y+obs.h&&dino.y+dino.h>obs.y){
+      run=false;ctx.fillText("GAME OVER",250,90);return;}
+  draw();requestAnimationFrame(update);
+ }
+
+ document.addEventListener("keydown",function(e){
+  if(e.code==="Space"&&!dino.jump&&run){dino.vy=-10;dino.jump=true;}
+  if(e.code==="Escape"){wrapper.remove();run=false;}
+ });
+
+ update();
+}
 </script>
 
 </body>
