@@ -17,8 +17,6 @@ body {
 body::after {
   content: "";
   position: fixed;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   background: repeating-linear-gradient(
@@ -65,6 +63,7 @@ body::after {
 .title {
   font-size: 20px;
   margin-bottom: 25px;
+  height: 24px;
 }
 
 .bar-section { margin-bottom: 20px; }
@@ -82,32 +81,23 @@ body::after {
   transition: width 0.6s ease;
 }
 
-.links {
-  margin-top: 40px;
-}
-
-.links a {
-  display: block;
-  color: #00ff99;
-  text-decoration: none;
-  margin: 8px 0;
-  transition: 0.3s;
-}
-
-.links a:hover {
-  color: white;
-  padding-left: 12px;
-  text-shadow: 0 0 8px #00ff99;
-}
-
-/* FAKE LOG TERMINAL */
-.logs {
+.terminal {
   margin-top: 40px;
   border-top: 1px solid #00ff99;
   padding-top: 15px;
-  font-size: 13px;
-  height: 120px;
-  overflow: hidden;
+}
+
+#output div {
+  margin-bottom: 4px;
+}
+
+input {
+  background: black;
+  border: none;
+  color: #00ff99;
+  font-family: monospace;
+  outline: none;
+  width: 80%;
 }
 </style>
 </head>
@@ -120,7 +110,7 @@ body::after {
 <div class="clock" id="clock"></div>
 
 <div class="container">
-  <div class="title">Riza Fauji - System Status</div>
+  <div class="title" id="typing-title"></div>
 
   <div class="bar-section">
     Frontend Development
@@ -137,29 +127,24 @@ body::after {
     <div class="bar"><div class="fill" id="problem"></div></div>
   </div>
 
-  <div class="links">
-    <div>user@riza:~$ contact</div>
-
-    <a href="mailto:rizafauji7@gmail.com">├── [MAIL] Email</a>
-    <a href="https://linkedin.com/in/riza221" target="_blank">├── [NET ] LinkedIn</a>
-    <a href="https://wa.me/6282132746345" target="_blank">├── [MSG ] WhatsApp</a>
-    <a href="https://t.me/rizax_fauz" target="_blank">└── [TG  ] Telegram</a>
-  </div>
-
-  <!-- Visitor Info -->
+  <!-- REAL VISITOR INFO -->
   <div style="margin-top:30px;">
     user@riza:~$ whoami<br>
     IP: <span id="ip">Detecting...</span><br>
-    Visits: <span id="visits"></span>
+    Visits: <span id="visits">Loading...</span>
   </div>
 
-  <!-- Fake Logs -->
-  <div class="logs" id="logs"></div>
+  <!-- INTERACTIVE TERMINAL -->
+  <div class="terminal">
+    <div id="output"></div>
+    <div>user@riza:~$ <input id="command" autofocus></div>
+  </div>
 
 </div>
 
 <script>
-/* BOOT SCREEN */
+
+/* BOOT */
 const bootLines = [
   "Initializing system...",
   "Loading modules...",
@@ -184,6 +169,18 @@ function showBootLine() {
 }
 window.onload = showBootLine;
 
+/* TYPING TITLE */
+const titleText = "Riza Fauji - System Status";
+let i = 0;
+function typeTitle() {
+  if (i < titleText.length) {
+    document.getElementById("typing-title").textContent += titleText.charAt(i);
+    i++;
+    setTimeout(typeTitle, 80);
+  }
+}
+setTimeout(typeTitle, 2500);
+
 /* SKILL BARS */
 function animateBar(id, min, max) {
   const el = document.getElementById(id);
@@ -198,50 +195,58 @@ animateBar("problem", 80, 98);
 
 /* CLOCK */
 function updateClock() {
-  const now = new Date();
   document.getElementById("clock").textContent =
-    "Local Time: " + now.toLocaleTimeString();
+    "Local Time: " + new Date().toLocaleTimeString();
 }
 setInterval(updateClock, 1000);
 updateClock();
 
-/* FAKE LOGS */
-const logs = document.getElementById("logs");
-const logLines = [
-  "Scanning network...",
-  "Establishing secure channel...",
-  "Encrypting session...",
-  "Deploying frontend module...",
-  "Backend sync complete.",
-  "System running stable.",
-  "Monitoring traffic..."
-];
+/* REAL IP */
+fetch("https://api.ipify.org?format=json")
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById("ip").textContent = data.ip;
+  })
+  .catch(() => {
+    document.getElementById("ip").textContent = "Unavailable";
+  });
 
-setInterval(() => {
-  const line = document.createElement("div");
-  line.textContent = logLines[Math.floor(Math.random()*logLines.length)];
-  logs.appendChild(line);
+/* REAL VISITOR COUNTER */
+fetch("https://api.countapi.xyz/hit/rizafauji.dev/visits")
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById("visits").textContent = data.value;
+  })
+  .catch(() => {
+    document.getElementById("visits").textContent = "Error";
+  });
 
-  if (logs.children.length > 6) {
-    logs.removeChild(logs.firstChild);
+/* TERMINAL COMMANDS */
+const input = document.getElementById("command");
+const output = document.getElementById("output");
+
+const commands = {
+  help: "Available commands: help, about, projects, contact",
+  about: "Riza Fauji - Developer focused on frontend & backend systems.",
+  projects: "1. Terminal Portfolio\n2. System Monitor UI\n3. Web Experiments",
+  contact: "Email: rizafauji7@gmail.com"
+};
+
+input.addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    const cmd = input.value.trim();
+    const line = document.createElement("div");
+    line.textContent = "user@riza:~$ " + cmd;
+    output.appendChild(line);
+
+    const response = document.createElement("div");
+    response.textContent = commands[cmd] || "Command not found.";
+    output.appendChild(response);
+
+    input.value = "";
   }
-}, 1500);
+});
 
-/* FAKE IP DETECTOR */
-function generateFakeIP() {
-  return `${rand()}.${rand()}.${rand()}.${rand()}`;
-}
-function rand() {
-  return Math.floor(Math.random()*255);
-}
-document.getElementById("ip").textContent = generateFakeIP();
-
-/* VISITOR COUNTER (Local) */
-let visits = localStorage.getItem("visit-count");
-if (!visits) visits = 0;
-visits++;
-localStorage.setItem("visit-count", visits);
-document.getElementById("visits").textContent = visits;
 </script>
 
 </body>
