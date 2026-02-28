@@ -38,12 +38,8 @@ body{
   from{ transform:scale(1); text-shadow:0 0 10px #00ff99; }
   to{ transform:scale(1.3); text-shadow:0 0 25px #00ff99; }
 }
-.fadeOut{
-  animation:fadeOut 1s forwards;
-}
-@keyframes fadeOut{
-  to{opacity:0;visibility:hidden;}
-}
+.fadeOut{ animation:fadeOut 1s forwards; }
+@keyframes fadeOut{ to{opacity:0;visibility:hidden;} }
 
 /* scanline */
 body::after{
@@ -86,12 +82,7 @@ body::after{
 .fill{
   height:100%;
   background:#00ff99;
-  animation:breath 3s infinite ease-in-out;
-}
-@keyframes breath{
-  0%{ width:85%; }
-  50%{ width:95%; }
-  100%{ width:85%; }
+  width:80%;
 }
 
 a{
@@ -173,7 +164,7 @@ Problem Solving
 <div style="margin-top:25px;">
 user@riza:~$ whoami<br>
 IP: <span id="ip">Detecting...</span><br>
-Visits: <span id="visits">Loading...</span>
+Visits: <span id="visits">0</span>
 </div>
 
 <div style="margin-top:25px;">
@@ -202,6 +193,29 @@ user@riza:~$ contact<br>
 
 <script>
 
+/* RANDOM PROGRESS BAR */
+document.querySelectorAll(".fill").forEach(bar=>{
+let duration = 2 + Math.random()*3;
+let min = 60 + Math.random()*20;
+let max = 80 + Math.random()*15;
+
+bar.animate([
+  { width: min+"%" },
+  { width: max+"%" },
+  { width: min+"%" }
+],{
+  duration: duration*1000,
+  iterations: Infinity
+});
+});
+
+/* FAKE VISITS */
+let visits = localStorage.getItem("riza_visits");
+if(!visits){ visits = 0; }
+visits++;
+localStorage.setItem("riza_visits", visits);
+document.getElementById("visits").textContent = visits;
+
 /* BOOT */
 const bootText=document.getElementById("bootText");
 const countdownEl=document.getElementById("countdown");
@@ -216,9 +230,7 @@ if(i<lines.length){
 bootText.textContent+=lines[i]+"\n";
 i++;
 setTimeout(bootLines,600);
-}else{
-startCountdown();
-}
+}else startCountdown();
 }
 
 function startCountdown(){
@@ -226,9 +238,8 @@ let count=5;
 countdownEl.textContent=count;
 let interval=setInterval(()=>{
 count--;
-if(count>0){
-countdownEl.textContent=count;
-}else{
+if(count>0) countdownEl.textContent=count;
+else{
 clearInterval(interval);
 countdownEl.textContent="ACCESS GRANTED";
 setTimeout(()=>{
@@ -246,38 +257,42 @@ input.focus();
 window.addEventListener("load",bootLines);
 
 /* CLOCK */
-function updateClock(){
+setInterval(()=>{
 document.getElementById("clock").textContent=
 "Local Time: "+new Date().toLocaleTimeString();
-}
-setInterval(updateClock,1000);
-updateClock();
+},1000);
 
 /* IP */
 fetch("https://api.ipify.org?format=json")
-.then(res=>res.json())
-.then(data=>document.getElementById("ip").textContent=data.ip)
+.then(r=>r.json())
+.then(d=>document.getElementById("ip").textContent=d.ip)
 .catch(()=>document.getElementById("ip").textContent="Unavailable");
-
-/* VISITS */
-fetch("https://api.countapi.xyz/hit/rizafauji.dev/visits")
-.then(res=>res.json())
-.then(data=>document.getElementById("visits").textContent=data.value)
-.catch(()=>document.getElementById("visits").textContent="Error");
 
 /* TERMINAL */
 const output=document.getElementById("output");
 const gameBox=document.getElementById("gameBox");
 
+const commands={
+email:()=>window.open("https://mail.google.com/mail/u/0/?tf=cm&fs=1&to=rizafauji7@gmail.com"),
+linkedin:()=>window.open("https://www.linkedin.com/in/riza221/"),
+whatsapp:()=>window.open("https://wa.me/6282132746345"),
+telegram:()=>window.open("https://t.me/rizax_fauz"),
+medium:()=>window.open("https://medium.com/@rizafauziaja"),
+farcaster:()=>window.open("https://farcaster.xyz/riza221"),
+dino:()=>startGame(),
+clear:()=>output.innerHTML="",
+help:()=>output.innerHTML+=`
+<div>Available commands:</div>
+<div>email | linkedin | whatsapp | telegram</div>
+<div>medium | farcaster | dino | clear | help</div>`
+};
+
 input.addEventListener("keydown",function(e){
 if(e.key==="Enter"){
 const cmd=input.value.trim().toLowerCase();
 output.innerHTML+="<div>user@riza:~$ "+cmd+"</div>";
-
-if(cmd==="dino") startGame();
-else if(cmd==="clear") output.innerHTML="";
-else output.innerHTML+="<div>Command not found.</div>";
-
+if(commands[cmd]) commands[cmd]();
+else output.innerHTML+="<div>Command not found. Type 'help'</div>";
 input.value="";
 }
 });
@@ -316,7 +331,6 @@ if(e.code==="Escape") stopGame();
 
 function startGame(){
 if(gameBox.style.display==="block") return;
-
 gameBox.style.display="block";
 score=0;
 scoreEl.textContent="Score: 0";
@@ -325,14 +339,11 @@ cactus.style.right="-20px";
 gameInterval=setInterval(()=>{
 let cactusPos=600-parseInt(cactus.style.right||-20);
 let dinoBottom=parseInt(window.getComputedStyle(dino).bottom);
-
 cactus.style.right=(parseInt(cactus.style.right||-20)+speed)+"px";
-
 if(cactusPos>30 && cactusPos<60 && dinoBottom<25){
 alert("GAME OVER");
 stopGame();
 }
-
 if(parseInt(cactus.style.right)>620) cactus.style.right="-20px";
 },20);
 
