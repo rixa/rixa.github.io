@@ -14,6 +14,16 @@ body{
   overflow:hidden;
 }
 
+/* MATRIX CANVAS */
+#matrix{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:-1;
+}
+
 /* BOOTSCREEN */
 #bootScreen{
   position:fixed;
@@ -41,61 +51,58 @@ body{
 .fadeOut{ animation:fadeOut 1s forwards; }
 @keyframes fadeOut{ to{opacity:0;visibility:hidden;} }
 
-/* scanline */
-body::after{
-  content:"";
-  position:fixed;
-  width:100%;
-  height:100%;
-  background:repeating-linear-gradient(
-    to bottom,
-    rgba(0,255,153,0.03),
-    rgba(0,255,153,0.03) 1px,
-    transparent 1px,
-    transparent 3px
-  );
-  pointer-events:none;
-}
-
 .clock{
   position:fixed;
   top:15px;
   right:20px;
   font-size:14px;
 }
+
 .container{
   padding:25px;
-  max-width:900px;
+  max-width:1000px;
   margin:auto;
   overflow-y:auto;
   height:100vh;
 }
-.title{ font-size:20px; margin-bottom:25px; }
 
+.title{
+  font-size:22px;
+  margin-bottom:25px;
+}
+
+/* SYSTEM BARS */
+.stat{
+  margin-bottom:15px;
+}
 .bar{
   height:18px;
   background:#002b1a;
   border:1px solid #00ff99;
-  margin-bottom:10px;
+  position:relative;
   overflow:hidden;
 }
 .fill{
   height:100%;
+  width:0%;
   background:#00ff99;
-  width:80%;
+  transition:width 0.5s linear;
+}
+.percent{
+  position:absolute;
+  right:8px;
+  top:0;
+  font-size:12px;
 }
 
-a{
-  color:#00ff99;
-  text-decoration:none;
-  cursor:pointer;
-}
-a:hover{ color:white; }
-
+/* TERMINAL */
 .terminal{
   margin-top:30px;
   border-top:1px solid #00ff99;
   padding-top:15px;
+}
+#output{
+  min-height:100px;
 }
 input{
   background:black;
@@ -104,6 +111,16 @@ input{
   font-family:monospace;
   outline:none;
   width:80%;
+}
+.cursor{
+  display:inline-block;
+  width:8px;
+  background:#00ff99;
+  animation:blink 1s infinite;
+}
+@keyframes blink{
+  0%,50%,100%{opacity:1;}
+  25%,75%{opacity:0;}
 }
 
 /* DINO */
@@ -132,15 +149,25 @@ input{
   bottom:0;
   right:-20px;
 }
-#score{
+#score,#highscore{
   position:absolute;
   top:5px;
-  right:10px;
   font-size:12px;
 }
+#score{ right:10px; }
+#highscore{ left:10px; }
+
+a{
+  color:#00ff99;
+  text-decoration:none;
+}
+a:hover{ color:white; }
+
 </style>
 </head>
 <body>
+
+<canvas id="matrix"></canvas>
 
 <div id="bootScreen">
   <div id="bootText"></div>
@@ -150,79 +177,132 @@ input{
 <div class="clock" id="clock"></div>
 
 <div class="container">
-<div class="title">Riza Fauji - System Status</div>
+<div class="title">Riza Fauji - Brutal System Monitor</div>
 
-Frontend Development
-<div class="bar"><div class="fill"></div></div>
+<!-- CPU CORES -->
+<div class="stat">CPU Core 1<div class="bar"><div class="fill" id="cpu1"></div><div class="percent" id="cpu1p">0%</div></div></div>
+<div class="stat">CPU Core 2<div class="bar"><div class="fill" id="cpu2"></div><div class="percent" id="cpu2p">0%</div></div></div>
+<div class="stat">CPU Core 3<div class="bar"><div class="fill" id="cpu3"></div><div class="percent" id="cpu3p">0%</div></div></div>
+<div class="stat">CPU Core 4<div class="bar"><div class="fill" id="cpu4"></div><div class="percent" id="cpu4p">0%</div></div></div>
 
-Backend Development
-<div class="bar"><div class="fill"></div></div>
+<!-- RAM -->
+<div class="stat">RAM Usage<div class="bar"><div class="fill" id="ram"></div><div class="percent" id="ramp">0%</div></div></div>
 
-Problem Solving
-<div class="bar"><div class="fill"></div></div>
+<!-- NETWORK -->
+<div class="stat">Network RX<div class="bar"><div class="fill" id="net"></div><div class="percent" id="netp">0 KB/s</div></div></div>
 
-<div style="margin-top:25px;">
-user@riza:~$ whoami<br>
-IP: <span id="ip">Detecting...</span><br>
-Visits: <span id="visits">0</span>
+<!-- UPTIME -->
+<div style="margin-top:15px;">
+Uptime: <span id="uptime">0s</span>
 </div>
 
-<div style="margin-top:25px;">
-user@riza:~$ contact<br>
-┌─ Contact List<br>
-├─ <a href="https://mail.google.com/mail/u/0/?tf=cm&fs=1&to=rizafauji7@gmail.com" target="_blank">Email</a><br>
-├─ <a href="https://www.linkedin.com/in/riza221/" target="_blank">LinkedIn</a><br>
-├─ <a href="https://wa.me/6282132746345" target="_blank">WhatsApp</a><br>
-├─ <a href="https://t.me/rizax_fauz" target="_blank">Telegram</a><br>
-├─ <a href="https://medium.com/@rizafauziaja" target="_blank">Medium</a><br>
-├─ <a href="https://farcaster.xyz/riza221" target="_blank">Farcaster</a><br>
-└─ <a onclick="startGame()">dino (play game)</a>
+<div style="margin-top:20px;">
+Visits: <span id="visits">0</span>
 </div>
 
 <div class="terminal">
 <div id="output"></div>
-<div>user@riza:~$ <input id="command"></div>
+<div>user@riza:~$ <input id="command"><span class="cursor"></span></div>
 
 <div id="gameBox">
+<div id="highscore">High: 0</div>
 <div id="score">Score: 0</div>
 <div id="dino"></div>
 <div id="cactus"></div>
 </div>
 </div>
-</div>
 
+</div>
 <script>
 
-/* RANDOM PROGRESS BAR */
-document.querySelectorAll(".fill").forEach(bar=>{
-let duration = 2 + Math.random()*3;
-let min = 60 + Math.random()*20;
-let max = 80 + Math.random()*15;
+/* ================= MATRIX RAIN ================= */
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
 
-bar.animate([
-  { width: min+"%" },
-  { width: max+"%" },
-  { width: min+"%" }
-],{
-  duration: duration*1000,
-  iterations: Infinity
-});
-});
+canvas.height = window.innerHeight;
+canvas.width = window.innerWidth;
 
-/* FAKE VISITS */
-let visits = localStorage.getItem("riza_visits");
-if(!visits){ visits = 0; }
+const letters = "01RIZAFAUJI";
+const fontSize = 14;
+const columns = canvas.width / fontSize;
+const drops = [];
+
+for (let x = 0; x < columns; x++) drops[x] = 1;
+
+function drawMatrix(){
+  ctx.fillStyle = "rgba(0,0,0,0.05)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = "#00ff99";
+  ctx.font = fontSize + "px monospace";
+
+  for(let i=0;i<drops.length;i++){
+    const text = letters[Math.floor(Math.random()*letters.length)];
+    ctx.fillText(text, i*fontSize, drops[i]*fontSize);
+
+    if(drops[i]*fontSize > canvas.height && Math.random()>0.975)
+      drops[i] = 0;
+
+    drops[i]++;
+  }
+}
+setInterval(drawMatrix,33);
+
+/* ================= FAKE SYSTEM STATS ================= */
+function randomStat(id, pid){
+  let val = Math.floor(Math.random()*100);
+  const bar = document.getElementById(id);
+  const percent = document.getElementById(pid);
+
+  bar.style.width = val+"%";
+  percent.textContent = val+"%";
+
+  if(val>80) bar.style.background="#ff0044";
+  else if(val>60) bar.style.background="#ffaa00";
+  else bar.style.background="#00ff99";
+}
+
+setInterval(()=>{
+  randomStat("cpu1","cpu1p");
+  randomStat("cpu2","cpu2p");
+  randomStat("cpu3","cpu3p");
+  randomStat("cpu4","cpu4p");
+  randomStat("ram","ramp");
+
+  let net = Math.floor(Math.random()*900);
+  document.getElementById("net").style.width = (net/10)+"%";
+  document.getElementById("netp").textContent = net+" KB/s";
+},1000);
+
+/* ================= UPTIME ================= */
+let seconds = 0;
+setInterval(()=>{
+  seconds++;
+  let h = Math.floor(seconds/3600);
+  let m = Math.floor((seconds%3600)/60);
+  let s = seconds%60;
+  document.getElementById("uptime").textContent =
+    h+"h "+m+"m "+s+"s";
+},1000);
+
+/* ================= VISITS ================= */
+let visits = localStorage.getItem("riza_brutal_visits") || 0;
 visits++;
-localStorage.setItem("riza_visits", visits);
+localStorage.setItem("riza_brutal_visits", visits);
 document.getElementById("visits").textContent = visits;
 
-/* BOOT */
+/* ================= CLOCK ================= */
+setInterval(()=>{
+  document.getElementById("clock").textContent =
+  "Local Time: "+new Date().toLocaleTimeString();
+},1000);
+
+/* ================= BOOT ================= */
 const bootText=document.getElementById("bootText");
 const countdownEl=document.getElementById("countdown");
 const bootScreen=document.getElementById("bootScreen");
 const input=document.getElementById("command");
 
-const lines=["Initializing system...","Loading modules...","Boot sequence..."];
+const lines=["Initializing system...","Injecting matrix core...","Booting brutal mode..."];
 let i=0;
 
 function bootLines(){
@@ -253,24 +333,12 @@ input.focus();
 }
 },800);
 }
-
 window.addEventListener("load",bootLines);
 
-/* CLOCK */
-setInterval(()=>{
-document.getElementById("clock").textContent=
-"Local Time: "+new Date().toLocaleTimeString();
-},1000);
-
-/* IP */
-fetch("https://api.ipify.org?format=json")
-.then(r=>r.json())
-.then(d=>document.getElementById("ip").textContent=d.ip)
-.catch(()=>document.getElementById("ip").textContent="Unavailable");
-
-/* TERMINAL */
+/* ================= TERMINAL ================= */
 const output=document.getElementById("output");
-const gameBox=document.getElementById("gameBox");
+const history=[];
+let historyIndex=0;
 
 const commands={
 email:()=>window.open("https://mail.google.com/mail/u/0/?tf=cm&fs=1&to=rizafauji7@gmail.com"),
@@ -279,30 +347,48 @@ whatsapp:()=>window.open("https://wa.me/6282132746345"),
 telegram:()=>window.open("https://t.me/rizax_fauz"),
 medium:()=>window.open("https://medium.com/@rizafauziaja"),
 farcaster:()=>window.open("https://farcaster.xyz/riza221"),
-dino:()=>startGame(),
 clear:()=>output.innerHTML="",
 help:()=>output.innerHTML+=`
-<div>Available commands:</div>
-<div>email | linkedin | whatsapp | telegram</div>
-<div>medium | farcaster | dino | clear | help</div>`
+<div>Available: email linkedin whatsapp telegram medium farcaster dino clear help</div>`
 };
 
 input.addEventListener("keydown",function(e){
 if(e.key==="Enter"){
 const cmd=input.value.trim().toLowerCase();
+history.push(cmd);
+historyIndex=history.length;
 output.innerHTML+="<div>user@riza:~$ "+cmd+"</div>";
-if(commands[cmd]) commands[cmd]();
-else output.innerHTML+="<div>Command not found. Type 'help'</div>";
+
+if(cmd==="dino") startGame();
+else if(commands[cmd]) commands[cmd]();
+else output.innerHTML+="<div>Command not found</div>";
+
 input.value="";
+}
+if(e.key==="ArrowUp"){
+if(historyIndex>0){
+historyIndex--;
+input.value=history[historyIndex];
+}
+}
+if(e.key==="ArrowDown"){
+if(historyIndex<history.length-1){
+historyIndex++;
+input.value=history[historyIndex];
+}
 }
 });
 
-/* DINO */
+/* ================= DINO BRUTAL ================= */
 const dino=document.getElementById("dino");
 const cactus=document.getElementById("cactus");
 const scoreEl=document.getElementById("score");
+const highEl=document.getElementById("highscore");
+const gameBox=document.getElementById("gameBox");
 
 let jumping=false,score=0,speed=5,gameInterval,scoreInterval;
+let highscore=localStorage.getItem("riza_highscore")||0;
+highEl.textContent="High: "+highscore;
 
 function jump(){
 if(jumping)return;
@@ -333,6 +419,7 @@ function startGame(){
 if(gameBox.style.display==="block") return;
 gameBox.style.display="block";
 score=0;
+speed=5;
 scoreEl.textContent="Score: 0";
 cactus.style.right="-20px";
 
@@ -340,15 +427,17 @@ gameInterval=setInterval(()=>{
 let cactusPos=600-parseInt(cactus.style.right||-20);
 let dinoBottom=parseInt(window.getComputedStyle(dino).bottom);
 cactus.style.right=(parseInt(cactus.style.right||-20)+speed)+"px";
+
 if(cactusPos>30 && cactusPos<60 && dinoBottom<25){
-alert("GAME OVER");
 stopGame();
 }
+
 if(parseInt(cactus.style.right)>620) cactus.style.right="-20px";
 },20);
 
 scoreInterval=setInterval(()=>{
 score++;
+if(score%50===0) speed+=1;
 scoreEl.textContent="Score: "+score;
 },200);
 }
@@ -357,8 +446,11 @@ function stopGame(){
 clearInterval(gameInterval);
 clearInterval(scoreInterval);
 gameBox.style.display="none";
+if(score>highscore){
+highscore=score;
+localStorage.setItem("riza_highscore",highscore);
+highEl.textContent="High: "+highscore;
 }
-</script>
+}
 
-</body>
-</html>
+</script>
