@@ -3,367 +3,212 @@
 <head>
 <meta charset="UTF-8">
 <title>Riza Fauji | Interactive Portfolio</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
 body{
-  margin:0;
-  background:black;
-  color:#00ff99;
-  font-family:monospace;
-  overflow:hidden;
+    background:black;
+    color:#00ff9f;
+    font-family:monospace;
+    padding:40px;
+    overflow-x:hidden;
 }
 
-/* INTRO SCREEN */
-#intro{
-  position:fixed;
-  width:100%;
-  height:100%;
-  background:black;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:40px;
-  z-index:999;
-  flex-direction:column;
+h1{
+    font-size:26px;
 }
 
-/* MAIN CONTENT */
-#main{
-  display:none;
-  padding:25px;
-  max-width:1000px;
-  margin:auto;
+.progress-container{
+    margin:20px 0;
 }
 
-.clock{
-  position:fixed;
-  top:15px;
-  right:20px;
-  font-size:14px;
+.label{
+    margin-bottom:5px;
 }
 
-/* SKILLS */
-.stat{ margin-bottom:18px; }
+.progress{
+    width:100%;
+    height:20px;
+    border:1px solid #00ff9f;
+    position:relative;
+    overflow:hidden;
+}
 
 .bar{
-  height:18px;
-  background:#002b1a;
-  border:1px solid #00ff99;
-  position:relative;
-  overflow:hidden;
-}
-
-.fill{
-  height:100%;
-  width:0%;
-  background:#00ff99;
-  transition:width 0.6s ease;
+    height:100%;
+    background:#00ff9f;
+    width:0%;
+    transition:width 2s ease-in-out;
 }
 
 .percent{
-  position:absolute;
-  right:8px;
-  top:0;
-  font-size:12px;
-}
-
-/* CONTACT */
-.contact{
-  margin-top:20px;
-  border-top:1px solid #00ff99;
-  padding-top:15px;
+    position:absolute;
+    right:10px;
+    top:0;
+    font-size:14px;
 }
 
 .contact a{
-  display:block;
-  color:#00ff99;
-  text-decoration:none;
-  margin-bottom:3px;
+    display:block;
+    color:#00ff9f;
+    text-decoration:none;
+    margin:3px 0;
 }
 
-.contact a:hover{ color:white; }
-
-/* TERMINAL */
-.terminal{
-  margin-top:15px;
-  border-top:1px solid #00ff99;
-  padding-top:10px;
+.contact a:hover{
+    text-decoration:underline;
 }
 
-#output{ min-height:80px; }
-
-input{
-  background:black;
-  border:none;
-  color:#00ff99;
-  font-family:monospace;
-  outline:none;
-  width:70%;
+#terminal{
+    margin-top:30px;
 }
 
-.cursor{
-  display:inline-block;
-  width:8px;
-  background:#00ff99;
-  animation:blink 1s infinite;
-}
-
-@keyframes blink{
-  0%,50%,100%{opacity:1;}
-  25%,75%{opacity:0;}
-}
-
-/* DINO */
-#gameBox{
-  margin-top:15px;
-  border:1px solid #00ff99;
-  width:600px;
-  height:200px;
-  position:relative;
-  display:none;
-  overflow:hidden;
+#visit{
+    margin-top:10px;
 }
 
 #dino{
-  width:20px;
-  height:20px;
-  background:#00ff99;
-  position:absolute;
-  bottom:0;
-  left:30px;
+    margin-top:10px;
+    font-size:18px;
 }
 
-#cactus{
-  width:20px;
-  height:30px;
-  background:#00ff99;
-  position:absolute;
-  bottom:0;
-  right:-20px;
-}
-
-#score,#highscore{
-  position:absolute;
-  top:5px;
-  font-size:12px;
-}
-
-#score{ right:10px; }
-#highscore{ left:10px; }
-
-.line{
-  height:2px;
-  background:#00ff99;
-  margin:20px 0;
-  animation:lineMove 1.2s linear infinite;
-}
-
-@keyframes lineMove{
-  0%{transform:translateX(-100%);}
-  100%{transform:translateX(100%);}
+#overlay{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:black;
+    color:#00ff9f;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:40px;
+    z-index:999;
 }
 </style>
 </head>
-
 <body>
 
-<div id="intro">
-<div id="introText">HELLO</div>
+<div id="overlay">HELLO</div>
+
+<h1>Riza Fauji | Interactive Portfolio</h1>
+
+<div id="visit"></div>
+
+<div class="progress-container">
+<div class="label">Frontend Development</div>
+<div class="progress">
+<div class="bar" data-percent="90"></div>
+<div class="percent">90%</div>
+</div>
 </div>
 
-<div id="main">
+<div class="progress-container">
+<div class="label">Backend Development</div>
+<div class="progress">
+<div class="bar" data-percent="85"></div>
+<div class="percent">85%</div>
+</div>
+</div>
 
-<div class="clock" id="clock"></div>
+<div class="progress-container">
+<div class="label">Problem Solving</div>
+<div class="progress">
+<div class="bar" data-percent="88"></div>
+<div class="percent">88%</div>
+</div>
+</div>
 
-<h2>Riza Fauji | Interactive Portfolio</h2>
+<div class="progress-container">
+<div class="label">System & Automation</div>
+<div class="progress">
+<div class="bar" data-percent="80"></div>
+<div class="percent">80%</div>
+</div>
+</div>
 
-<div>Public IP: <span id="ip">Loading...</span></div>
-<div>Visits: <span id="visits">0</span></div>
-
-<div class="line"></div>
-
-<div class="stat">Frontend Development
-<div class="bar"><div class="fill" data-value="90"></div><div class="percent">90%</div></div></div>
-
-<div class="stat">Backend Development
-<div class="bar"><div class="fill" data-value="85"></div><div class="percent">85%</div></div></div>
-
-<div class="stat">Problem Solving
-<div class="bar"><div class="fill" data-value="88"></div><div class="percent">88%</div></div></div>
-
-<div class="stat">System & Automation
-<div class="bar"><div class="fill" data-value="80"></div><div class="percent">80%</div></div></div>
+<hr>
 
 <div class="contact">
 <b>Contact:</b>
-<a href="mailto:rizafauji7@gmail.com">Email</a>
-<a href="https://linkedin.com/in/riza221" target="_blank">LinkedIn</a>
-<a href="https://wa.me/6282132746345" target="_blank">WhatsApp</a>
-<a href="https://t.me/rizax_fauz" target="_blank">Telegram</a>
-<a href="https://medium.com/@rizafauziaja" target="_blank">Medium</a>
-<a href="https://farcaster.xyz/riza221" target="_blank">Farcaster</a>
-<a href="#" onclick="startGame()">Dino (Play Game)</a>
+<a href="#" onclick="openWithIntro('mailto:youremail@email.com')">Email</a>
+<a href="#" onclick="openWithIntro('https://linkedin.com')">LinkedIn</a>
+<a href="#" onclick="openWithIntro('https://wa.me/628xxxx')">WhatsApp</a>
+<a href="#" onclick="openWithIntro('https://t.me/')">Telegram</a>
+<a href="#" onclick="openWithIntro('https://medium.com')">Medium</a>
+<a href="#" onclick="openWithIntro('https://warpcast.com')">Farcaster</a>
 </div>
 
-<div class="terminal">
-<div id="output"></div>
-<div>user@riza:~$ <input id="command"><span class="cursor"></span></div>
-
-<div id="gameBox">
-<div id="highscore">High: 0</div>
-<div id="score">Score: 0</div>
-<div id="dino"></div>
-<div id="cactus"></div>
+<div id="dino">
+<pre>
+      __
+     / _)
+ .-^^^-/ /
+__/       /
+<__.|_|-|_|
+</pre>
 </div>
 
-</div>
+<div id="terminal">
+user@riza:~$
 </div>
 
 <script>
+// VISIT COUNTER
+let visit = localStorage.getItem("visitCount") || 0;
+visit++;
+localStorage.setItem("visitCount", visit);
+document.getElementById("visit").innerText = "Visits: " + visit;
 
-/* INTRO ANIMATION */
-let introSeq=["HELLO","3","2","1"];
-let idx=0;
-let introText=document.getElementById("introText");
-
-let introInterval=setInterval(()=>{
-idx++;
-if(idx<introSeq.length){
-introText.textContent=introSeq[idx];
-}else{
-clearInterval(introInterval);
-document.getElementById("intro").style.display="none";
-document.getElementById("main").style.display="block";
-document.body.style.overflow="auto";
-animateBars();
-}
-},800);
-
-/* CLOCK */
-setInterval(()=>{
-document.getElementById("clock").textContent=
-"Local Time: "+new Date().toLocaleTimeString();
-},1000);
-
-/* IP */
-fetch("https://api.ipify.org?format=json")
-.then(res=>res.json())
-.then(data=>{
-document.getElementById("ip").textContent=data.ip;
-});
-
-/* VISITS */
-let visits=localStorage.getItem("riza_visits")||0;
-visits++;
-localStorage.setItem("riza_visits",visits);
-document.getElementById("visits").textContent=visits;
-
-/* SKILL ANIMATION */
+// PROGRESS ANIMATION RANDOM SPEED LOOP
 function animateBars(){
-document.querySelectorAll(".fill").forEach(bar=>{
-let val=bar.getAttribute("data-value");
-let randomDelay=Math.random()*500;
-setTimeout(()=>{ bar.style.width=val+"%"; },randomDelay);
-});
+    document.querySelectorAll(".bar").forEach(bar=>{
+        let percent = bar.getAttribute("data-percent");
+        let randomSpeed = Math.random() * 1500 + 800; 
+        bar.style.transition = randomSpeed + "ms";
+        bar.style.width = percent + "%";
+    });
 }
 
-/* TERMINAL COMMAND */
-const input=document.getElementById("command");
-const output=document.getElementById("output");
+setInterval(()=>{
+    document.querySelectorAll(".bar").forEach(bar=>{
+        bar.style.width = "0%";
+    });
+    setTimeout(animateBars,300);
+},4000);
 
-input.addEventListener("keydown",function(e){
-if(e.key==="Enter"){
-let cmd=input.value.trim().toLowerCase();
-output.innerHTML+="<div>user@riza:~$ "+cmd+"</div>";
-input.value="";
+animateBars();
 
-switch(cmd){
-case "email": window.open("mailto:rizafauji7@gmail.com"); break;
-case "linkedin": window.open("https://linkedin.com/in/riza221"); break;
-case "whatsapp": window.open("https://wa.me/6282132746345"); break;
-case "telegram": window.open("https://t.me/rizax_fauz"); break;
-case "medium": window.open("https://medium.com/@rizafauziaja"); break;
-case "farcaster": window.open("https://farcaster.xyz/riza221"); break;
-case "dino": startGame(); break;
-case "clear": output.innerHTML=""; break;
-default: output.innerHTML+="<div>Command not found</div>";
-}
-}
-});
-
-/* DINO */
-const gameBox=document.getElementById("gameBox");
-const dino=document.getElementById("dino");
-const cactus=document.getElementById("cactus");
-const scoreEl=document.getElementById("score");
-const highEl=document.getElementById("highscore");
-
-let jumping=false,score=0,speed=5,gameInterval,scoreInterval;
-let highscore=localStorage.getItem("riza_highscore")||0;
-highEl.textContent="High: "+highscore;
-
-function jump(){
-if(jumping)return;
-jumping=true;
-let up=0;
-let jumpUp=setInterval(()=>{
-if(up>=70){
-clearInterval(jumpUp);
-let down=setInterval(()=>{
-if(up<=0){clearInterval(down);jumping=false;}
-up-=5;
-dino.style.bottom=up+"px";
-},20);
-}
-up+=5;
-dino.style.bottom=up+"px";
-},20);
+// HELLO 3 2 1 INTRO
+function openWithIntro(url){
+    let overlay = document.getElementById("overlay");
+    overlay.style.display="flex";
+    let count = 3;
+    overlay.innerText="HELLO " + count;
+    let interval = setInterval(()=>{
+        count--;
+        if(count>0){
+            overlay.innerText="HELLO " + count;
+        }else{
+            clearInterval(interval);
+            window.location.href=url;
+        }
+    },700);
 }
 
-document.addEventListener("keydown",function(e){
-if(gameBox.style.display==="block"){
-if(e.code==="Space"){e.preventDefault();jump();}
-if(e.code==="Escape"){stopGame();}
-}
-});
-
-function startGame(){
-gameBox.style.display="block";
-score=0;
-speed=5;
-scoreEl.textContent="Score: 0";
-
-gameInterval=setInterval(()=>{
-let cactusPos=cactus.offsetLeft;
-if(cactusPos<-20){
-cactus.style.right="-20px";
-speed+=0.5;
-}else{
-cactus.style.right=(parseInt(getComputedStyle(cactus).right)+speed)+"px";
-}
-
-let dinoBottom=parseInt(getComputedStyle(dino).bottom);
-if(cactusPos<60 && cactusPos>0 && dinoBottom<20){
-stopGame();
-}
-},20);
-
-scoreInterval=setInterval(()=>{
-score++;
-scoreEl.textContent="Score: "+score;
-if(score>highscore){
-highscore=score;
-localStorage.setItem("riza_highscore",highscore);
-highEl.textContent="High: "+highscore;
-}
-},100);
-}
-
-function stopGame(){
-clearInterval(gameInterval);
-clearInterval(scoreInterval);
-gameBox.style.display="none";
+// PAGE LOAD INTRO
+window.onload = function(){
+    let overlay = document.getElementById("overlay");
+    let count = 3;
+    overlay.innerText="HELLO " + count;
+    let interval = setInterval(()=>{
+        count--;
+        if(count>0){
+            overlay.innerText="HELLO " + count;
+        }else{
+            clearInterval(interval);
+            overlay.style.display="none";
+        }
+    },700);
 }
 </script>
 
