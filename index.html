@@ -31,7 +31,6 @@ body{
   margin-bottom:25px;
 }
 
-/* SYSTEM BARS */
 .stat{ margin-bottom:15px; }
 
 .bar{
@@ -56,14 +55,13 @@ body{
   font-size:12px;
 }
 
-/* TERMINAL */
 .terminal{
   margin-top:30px;
   border-top:1px solid #00ff99;
   padding-top:15px;
 }
 
-#output{ min-height:100px; }
+#output{ min-height:120px; }
 
 input{
   background:black;
@@ -124,18 +122,8 @@ input{
 #score{ right:10px; }
 #highscore{ left:10px; }
 
-a{
-  color:#00ff99;
-  text-decoration:none;
-}
-
+a{ color:#00ff99; text-decoration:none; }
 a:hover{ color:white; }
-
-.contact{
-  margin-top:40px;
-  border-top:1px solid #00ff99;
-  padding-top:15px;
-}
 </style>
 </head>
 
@@ -146,6 +134,10 @@ a:hover{ color:white; }
 <div class="container">
 
 <div class="title">Riza Fauji | System Monitor</div>
+
+<div>Public IP: <span id="ip">Loading...</span></div>
+
+<br>
 
 <div class="stat">CPU Core 1<div class="bar"><div class="fill" id="cpu1"></div><div class="percent" id="cpu1p">0%</div></div></div>
 <div class="stat">CPU Core 2<div class="bar"><div class="fill" id="cpu2"></div><div class="percent" id="cpu2p">0%</div></div></div>
@@ -174,101 +166,138 @@ Visits: <span id="visits">0</span>
 <div id="dino"></div>
 <div id="cactus"></div>
 </div>
-</div>
 
-<div class="contact">
-  <div>Contact:</div>
-  <div><a href="https://mail.google.com/mail/u/0/?tf=cm&fs=1&to=rizafauji7@gmail.com" target="_blank">Email</a></div>
-  <div><a href="https://www.linkedin.com/in/riza221/" target="_blank">LinkedIn</a></div>
-  <div><a href="https://wa.me/6282132746345" target="_blank">WhatsApp</a></div>
-  <div><a href="https://t.me/rizax_fauz" target="_blank">Telegram</a></div>
-  <div><a href="https://medium.com/@rizafauziaja" target="_blank">Medium</a></div>
-  <div><a href="https://farcaster.xyz/riza221" target="_blank">Farcaster</a></div>
 </div>
-
 </div>
 
 <script>
 
-/* SYSTEM STATS */
-function randomStat(id, pid){
-  let val = Math.floor(Math.random()*100);
-  const bar = document.getElementById(id);
-  const percent = document.getElementById(pid);
+/* CLOCK */
+setInterval(()=>{
+document.getElementById("clock").textContent=
+"Local Time: "+new Date().toLocaleTimeString();
+},1000);
 
-  bar.style.width = val+"%";
-  percent.textContent = val+"%";
+/* PUBLIC IP */
+fetch("https://api.ipify.org?format=json")
+.then(res=>res.json())
+.then(data=>{
+document.getElementById("ip").textContent=data.ip;
+})
+.catch(()=>{
+document.getElementById("ip").textContent="Unavailable";
+});
+
+/* SYSTEM STATS */
+function randomStat(id,pid){
+let val=Math.floor(Math.random()*100);
+document.getElementById(id).style.width=val+"%";
+document.getElementById(pid).textContent=val+"%";
 }
 
 setInterval(()=>{
-  randomStat("cpu1","cpu1p");
-  randomStat("cpu2","cpu2p");
-  randomStat("cpu3","cpu3p");
-  randomStat("cpu4","cpu4p");
-  randomStat("ram","ramp");
+randomStat("cpu1","cpu1p");
+randomStat("cpu2","cpu2p");
+randomStat("cpu3","cpu3p");
+randomStat("cpu4","cpu4p");
+randomStat("ram","ramp");
 
-  let net = Math.floor(Math.random()*900);
-  document.getElementById("net").style.width = (net/10)+"%";
-  document.getElementById("netp").textContent = net+" KB/s";
+let net=Math.floor(Math.random()*900);
+document.getElementById("net").style.width=(net/10)+"%";
+document.getElementById("netp").textContent=net+" KB/s";
 },1000);
 
 /* UPTIME */
-let seconds = 0;
+let sec=0;
 setInterval(()=>{
-  seconds++;
-  let h = Math.floor(seconds/3600);
-  let m = Math.floor((seconds%3600)/60);
-  let s = seconds%60;
-  document.getElementById("uptime").textContent =
-    h+"h "+m+"m "+s+"s";
+sec++;
+let h=Math.floor(sec/3600);
+let m=Math.floor((sec%3600)/60);
+let s=sec%60;
+document.getElementById("uptime").textContent=h+"h "+m+"m "+s+"s";
 },1000);
 
 /* VISITS */
-let visits = localStorage.getItem("riza_visits") || 0;
+let visits=localStorage.getItem("riza_visits")||0;
 visits++;
-localStorage.setItem("riza_visits", visits);
-document.getElementById("visits").textContent = visits;
-
-/* CLOCK */
-setInterval(()=>{
-  document.getElementById("clock").textContent =
-  "Local Time: "+new Date().toLocaleTimeString();
-},1000);
+localStorage.setItem("riza_visits",visits);
+document.getElementById("visits").textContent=visits;
 
 /* TERMINAL */
 const input=document.getElementById("command");
 const output=document.getElementById("output");
-const history=[];
-let historyIndex=0;
 
 input.addEventListener("keydown",function(e){
 if(e.key==="Enter"){
-const cmd=input.value.trim().toLowerCase();
-history.push(cmd);
-historyIndex=history.length;
+let cmd=input.value.trim().toLowerCase();
 output.innerHTML+="<div>user@riza:~$ "+cmd+"</div>";
 input.value="";
-}
-if(e.key==="ArrowUp"){
-if(historyIndex>0){
-historyIndex--;
-input.value=history[historyIndex];
-}
-}
-if(e.key==="ArrowDown"){
-if(historyIndex<history.length-1){
-historyIndex++;
-input.value=history[historyIndex];
+
+switch(cmd){
+
+case "help":
+output.innerHTML+=`
+<div>Available commands:</div>
+<div>email</div>
+<div>linkedin</div>
+<div>whatsapp</div>
+<div>telegram</div>
+<div>medium</div>
+<div>farcaster</div>
+<div>dino</div>
+<div>clear</div>
+<div>ip</div>
+`;
+break;
+
+case "email":
+window.open("https://mail.google.com/mail/u/0/?tf=cm&fs=1&to=rizafauji7@gmail.com","_blank");
+break;
+
+case "linkedin":
+window.open("https://www.linkedin.com/in/riza221/","_blank");
+break;
+
+case "whatsapp":
+window.open("https://wa.me/6282132746345","_blank");
+break;
+
+case "telegram":
+window.open("https://t.me/rizax_fauz","_blank");
+break;
+
+case "medium":
+window.open("https://medium.com/@rizafauziaja","_blank");
+break;
+
+case "farcaster":
+window.open("https://farcaster.xyz/riza221","_blank");
+break;
+
+case "ip":
+output.innerHTML+="<div>"+document.getElementById("ip").textContent+"</div>";
+break;
+
+case "clear":
+output.innerHTML="";
+break;
+
+case "dino":
+startGame();
+break;
+
+default:
+output.innerHTML+="<div>Command not found</div>";
 }
 }
 });
 
-/* DINO */
+/* DINO GAME */
+const gameBox=document.getElementById("gameBox");
 const dino=document.getElementById("dino");
 const cactus=document.getElementById("cactus");
 const scoreEl=document.getElementById("score");
 const highEl=document.getElementById("highscore");
-const gameBox=document.getElementById("gameBox");
 
 let jumping=false,score=0,speed=5,gameInterval,scoreInterval;
 let highscore=localStorage.getItem("riza_highscore")||0;
@@ -294,11 +323,49 @@ dino.style.bottom=up+"px";
 
 document.addEventListener("keydown",function(e){
 if(gameBox.style.display==="block"){
-if(e.code==="Space"){ e.preventDefault(); jump(); }
-if(e.code==="Escape") stopGame();
+if(e.code==="Space"){e.preventDefault();jump();}
+if(e.code==="Escape"){stopGame();}
 }
 });
 
+function startGame(){
+gameBox.style.display="block";
+score=0;
+speed=5;
+scoreEl.textContent="Score: 0";
+
+gameInterval=setInterval(()=>{
+let cactusPos=cactus.offsetLeft;
+if(cactusPos<-20){
+cactus.style.right="-20px";
+speed+=0.5;
+}
+else{
+cactus.style.right=(parseInt(getComputedStyle(cactus).right)+speed)+"px";
+}
+
+let dinoBottom=parseInt(getComputedStyle(dino).bottom);
+if(cactusPos<60 && cactusPos>0 && dinoBottom<20){
+stopGame();
+}
+},20);
+
+scoreInterval=setInterval(()=>{
+score++;
+scoreEl.textContent="Score: "+score;
+if(score>highscore){
+highscore=score;
+localStorage.setItem("riza_highscore",highscore);
+highEl.textContent="High: "+highscore;
+}
+},100);
+}
+
+function stopGame(){
+clearInterval(gameInterval);
+clearInterval(scoreInterval);
+gameBox.style.display="none";
+}
 </script>
 
 </body>
