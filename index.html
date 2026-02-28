@@ -6,245 +6,239 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {
-  margin: 0;
-  background: black;
-  color: #00ff99;
-  font-family: monospace;
-  overflow-x: hidden;
+body{
+  margin:0;
+  background:black;
+  color:#00ff99;
+  font-family:monospace;
+  overflow-x:hidden;
 }
-
-body::after {
-  content: "";
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background: repeating-linear-gradient(
+body::after{
+  content:"";
+  position:fixed;
+  width:100%;
+  height:100%;
+  background:repeating-linear-gradient(
     to bottom,
     rgba(0,255,153,0.03),
     rgba(0,255,153,0.03) 1px,
     transparent 1px,
     transparent 3px
   );
-  pointer-events: none;
+  pointer-events:none;
+}
+.clock{
+  position:fixed;
+  top:15px;
+  right:20px;
+  font-size:14px;
+}
+.container{ padding:25px; }
+.title{ font-size:20px; margin-bottom:25px; }
+.bar{ height:18px; background:#002b1a; border:1px solid #00ff99; }
+.fill{ height:100%; width:80%; background:#00ff99; }
+
+.terminal{
+  margin-top:40px;
+  border-top:1px solid #00ff99;
+  padding-top:15px;
+}
+input{
+  background:black;
+  border:none;
+  color:#00ff99;
+  font-family:monospace;
+  outline:none;
+  width:80%;
 }
 
-#boot {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background: black;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  z-index: 9999;
+/* DINO GAME */
+#gameBox{
+  margin-top:20px;
+  border:1px solid #00ff99;
+  width:600px;
+  height:200px;
+  position:relative;
+  display:none;
+  overflow:hidden;
 }
-
-.fade-out { animation: fadeOut 1s forwards; }
-@keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
-
-.clock { position: fixed; top: 15px; right: 20px; font-size: 14px; }
-.container { padding: 25px; }
-.title { font-size: 20px; margin-bottom: 25px; height: 24px; }
-.bar-section { margin-bottom: 20px; }
-
-.bar {
-  height: 18px;
-  background: #002b1a;
-  border: 1px solid #00ff99;
+#dino{
+  width:20px;
+  height:20px;
+  background:#00ff99;
+  position:absolute;
+  bottom:0;
+  left:30px;
 }
-
-.fill {
-  height: 100%;
-  width: 0%;
-  background: #00ff99;
-  transition: width 0.6s ease;
+#cactus{
+  width:20px;
+  height:30px;
+  background:#00ff99;
+  position:absolute;
+  bottom:0;
+  right:-20px;
 }
-
-.terminal {
-  margin-top: 40px;
-  border-top: 1px solid #00ff99;
-  padding-top: 15px;
-}
-
-#output div { margin-bottom: 4px; }
-
-input {
-  background: black;
-  border: none;
-  color: #00ff99;
-  font-family: monospace;
-  outline: none;
-  width: 80%;
+#score{
+  position:absolute;
+  top:5px;
+  right:10px;
+  font-size:12px;
 }
 </style>
 </head>
 <body>
 
-<div id="boot"><div id="boot-text"></div></div>
 <div class="clock" id="clock"></div>
 
 <div class="container">
-  <div class="title" id="typing-title"></div>
+<div class="title">Riza Fauji - System Status</div>
 
-  <div class="bar-section">
-    Frontend Development
-    <div class="bar"><div class="fill" id="frontend"></div></div>
-  </div>
+Frontend Development
+<div class="bar"><div class="fill" style="width:90%"></div></div><br>
 
-  <div class="bar-section">
-    Backend Development
-    <div class="bar"><div class="fill" id="backend"></div></div>
-  </div>
+Backend Development
+<div class="bar"><div class="fill" style="width:80%"></div></div><br>
 
-  <div class="bar-section">
-    Problem Solving
-    <div class="bar"><div class="fill" id="problem"></div></div>
-  </div>
+Problem Solving
+<div class="bar"><div class="fill" style="width:95%"></div></div>
 
-  <div style="margin-top:30px;">
-    user@riza:~$ whoami<br>
-    IP: <span id="ip">Detecting...</span><br>
-    Visits: <span id="visits">Loading...</span>
-  </div>
+<div style="margin-top:30px;">
+user@riza:~$ whoami<br>
+IP: <span id="ip">Detecting...</span><br>
+Visits: <span id="visits">Loading...</span><br>
+Email: rizafauji7@gmail.com
+</div>
 
-  <div class="terminal">
-    <div id="output"></div>
-    <div>user@riza:~$ <input id="command" autofocus></div>
-  </div>
+<div class="terminal">
+<div id="output"></div>
+<div>user@riza:~$ <input id="command" autofocus></div>
+
+<div id="gameBox">
+<div id="score">Score: 0</div>
+<div id="dino"></div>
+<div id="cactus"></div>
+</div>
+
+</div>
 </div>
 
 <script>
-/* BOOT */
-const bootLines=["Initializing system...","Loading modules...","Access granted."];
-let lineIndex=0;
-const bootText=document.getElementById("boot-text");
-function showBootLine(){
- if(lineIndex<bootLines.length){
-  const p=document.createElement("div");
-  p.textContent=bootLines[lineIndex];
-  bootText.appendChild(p);
-  lineIndex++;
-  setTimeout(showBootLine,800);
- }else{
-  setTimeout(()=>{document.getElementById("boot").classList.add("fade-out");},800);
- }}
-window.onload=showBootLine;
-
-/* TITLE */
-const titleText="Riza Fauji - System Status";
-let i=0;
-function typeTitle(){
- if(i<titleText.length){
-  document.getElementById("typing-title").textContent+=titleText.charAt(i);
-  i++;
-  setTimeout(typeTitle,80);
- }}
-setTimeout(typeTitle,2500);
-
-/* BARS */
-function animateBar(id,min,max){
- const el=document.getElementById(id);
- setInterval(()=>{
-  const value=Math.floor(Math.random()*(max-min))+min;
-  el.style.width=value+"%";
- },1500);
-}
-animateBar("frontend",75,95);
-animateBar("backend",65,85);
-animateBar("problem",80,98);
 
 /* CLOCK */
 function updateClock(){
- document.getElementById("clock").textContent="Local Time: "+new Date().toLocaleTimeString();
+document.getElementById("clock").textContent=
+"Local Time: "+new Date().toLocaleTimeString();
 }
-setInterval(updateClock,1000);updateClock();
+setInterval(updateClock,1000);
+updateClock();
 
 /* IP */
 fetch("https://api.ipify.org?format=json")
 .then(res=>res.json())
-.then(data=>{document.getElementById("ip").textContent=data.ip;})
-.catch(()=>{document.getElementById("ip").textContent="Unavailable";});
+.then(data=>document.getElementById("ip").textContent=data.ip)
+.catch(()=>document.getElementById("ip").textContent="Unavailable");
 
-/* VISITOR */
+/* VISITS */
 fetch("https://api.countapi.xyz/hit/rizafauji.dev/visits")
 .then(res=>res.json())
-.then(data=>{document.getElementById("visits").textContent=data.value;})
-.catch(()=>{document.getElementById("visits").textContent="Error";});
+.then(data=>document.getElementById("visits").textContent=data.value)
+.catch(()=>document.getElementById("visits").textContent="Error");
 
 /* TERMINAL */
 const input=document.getElementById("command");
 const output=document.getElementById("output");
+const gameBox=document.getElementById("gameBox");
 
 const commands={
- help:"Available commands: help, about, projects, contact, dino",
- about:"Riza Fauji - Developer.",
- projects:"1. Terminal Portfolio\n2. System Monitor UI\n3. Web Experiments",
- contact:"Email: rizafauji7@gmail.com",
- dino:"Launching Dino..."
+help:"Available: help, about, projects, contact, dino",
+about:"Riza Fauji - Developer focused on frontend & backend systems.",
+projects:"1. Terminal Portfolio\n2. System Monitor UI\n3. Web Experiments",
+contact:"Email: rizafauji7@gmail.com"
 };
 
 input.addEventListener("keydown",function(e){
- if(e.key==="Enter"){
-  const cmd=input.value.trim();
-  const line=document.createElement("div");
-  line.textContent="user@riza:~$ "+cmd;
-  output.appendChild(line);
+if(e.key==="Enter"){
+const cmd=input.value.trim();
+const line=document.createElement("div");
+line.textContent="user@riza:~$ "+cmd;
+output.appendChild(line);
 
-  if(cmd==="dino"){ startDino(); }
-  else{
-   const response=document.createElement("div");
-   response.textContent=commands[cmd]||"Command not found.";
-   output.appendChild(response);
-  }
-  input.value="";
- }});
-
-/* DINO */
-function startDino(){
- const wrapper=document.createElement("div");
- wrapper.innerHTML=`<canvas id="game" width="600" height="180"
- style="background:black;border:1px solid #00ff99;"></canvas>
- <div>SPACE = Jump | ESC = Exit</div>`;
- output.appendChild(wrapper);
-
- const canvas=document.getElementById("game");
- const ctx=canvas.getContext("2d");
-
- let dino={x:50,y:130,w:20,h:20,vy:0,jump:false};
- let obs={x:600,y:140,w:20,h:20};
- let gravity=0.6,speed=6,score=0,run=true;
-
- function draw(){
-  ctx.clearRect(0,0,600,180);
-  ctx.fillStyle="#00ff99";
-  ctx.fillRect(dino.x,dino.y,dino.w,dino.h);
-  ctx.fillRect(obs.x,obs.y,obs.w,obs.h);
-  ctx.fillText("Score: "+score,500,20);
- }
-
- function update(){
-  if(!run)return;
-  dino.vy+=gravity;
-  dino.y+=dino.vy;
-  if(dino.y>130){dino.y=130;dino.vy=0;dino.jump=false;}
-  obs.x-=speed;
-  if(obs.x<-20){obs.x=600;score++;speed+=0.2;}
-  if(dino.x<obs.x+obs.w&&dino.x+dino.w>obs.x&&
-     dino.y<obs.y+obs.h&&dino.y+dino.h>obs.y){
-      run=false;ctx.fillText("GAME OVER",250,90);return;}
-  draw();requestAnimationFrame(update);
- }
-
- document.addEventListener("keydown",function(e){
-  if(e.code==="Space"&&!dino.jump&&run){dino.vy=-10;dino.jump=true;}
-  if(e.code==="Escape"){wrapper.remove();run=false;}
- });
-
- update();
+if(cmd==="dino"){
+gameBox.style.display="block";
+startGame();
+}else{
+const res=document.createElement("div");
+res.textContent=commands[cmd]||"Command not found.";
+output.appendChild(res);
 }
-</script>
+input.value="";
+}
+});
 
+/* DINO GAME */
+const dino=document.getElementById("dino");
+const cactus=document.getElementById("cactus");
+const scoreEl=document.getElementById("score");
+
+let jumping=false;
+let score=0;
+let speed=5;
+let gameInterval;
+let scoreInterval;
+
+function jump(){
+if(jumping)return;
+jumping=true;
+let up=0;
+let jumpUp=setInterval(()=>{
+if(up>=60){clearInterval(jumpUp);
+let down=setInterval(()=>{
+if(up<=0){clearInterval(down);jumping=false;}
+up-=5;
+dino.style.bottom=up+"px";
+},20);
+}
+up+=5;
+dino.style.bottom=up+"px";
+},20);
+}
+
+document.addEventListener("keydown",function(e){
+if(gameBox.style.display==="block"){
+if(e.code==="Space") jump();
+if(e.code==="Escape") stopGame();
+}
+});
+
+function startGame(){
+score=0;
+scoreEl.textContent="Score: 0";
+cactus.style.right="-20px";
+
+gameInterval=setInterval(()=>{
+let cactusLeft=parseInt(window.getComputedStyle(cactus).getPropertyValue("right"));
+cactus.style.right=(cactusLeft+speed)+"px";
+
+let dinoBottom=parseInt(window.getComputedStyle(dino).getPropertyValue("bottom"));
+if(cactusLeft>540 && cactusLeft<580 && dinoBottom<20){
+alert("GAME OVER");
+stopGame();
+}
+if(cactusLeft>620) cactus.style.right="-20px";
+},20);
+
+scoreInterval=setInterval(()=>{
+score++;
+scoreEl.textContent="Score: "+score;
+},200);
+}
+
+function stopGame(){
+clearInterval(gameInterval);
+clearInterval(scoreInterval);
+gameBox.style.display="none";
+}
+
+</script>
 </body>
 </html>
