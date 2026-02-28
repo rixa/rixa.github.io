@@ -39,11 +39,19 @@ body::after{
   margin:auto;
 }
 .title{ font-size:20px; margin-bottom:25px; }
-.bar{ height:18px; background:#002b1a; border:1px solid #00ff99; }
+.bar{ height:18px; background:#002b1a; border:1px solid #00ff99; margin-bottom:10px; }
 .fill{ height:100%; background:#00ff99; }
 
+a{
+  color:#00ff99;
+  text-decoration:none;
+}
+a:hover{
+  color:white;
+}
+
 .terminal{
-  margin-top:40px;
+  margin-top:30px;
   border-top:1px solid #00ff99;
   padding-top:15px;
 }
@@ -55,7 +63,6 @@ input{
   outline:none;
   width:80%;
 }
-a{ color:#00ff99; }
 
 /* DINO GAME */
 #gameBox{
@@ -99,18 +106,31 @@ a{ color:#00ff99; }
 <div class="title">Riza Fauji - System Status</div>
 
 Frontend Development
-<div class="bar"><div class="fill" style="width:90%"></div></div><br>
+<div class="bar"><div class="fill" style="width:90%"></div></div>
 
 Backend Development
-<div class="bar"><div class="fill" style="width:80%"></div></div><br>
+<div class="bar"><div class="fill" style="width:80%"></div></div>
 
 Problem Solving
 <div class="bar"><div class="fill" style="width:95%"></div></div>
 
-<div style="margin-top:30px;">
+<div style="margin-top:25px;">
 user@riza:~$ whoami<br>
 IP: <span id="ip">Detecting...</span><br>
 Visits: <span id="visits">Loading...</span>
+</div>
+
+<!-- CONTACT AUTO SHOW -->
+<div style="margin-top:25px;">
+user@riza:~$ contact<br>
+┌─ Contact List<br>
+├─ <a href="https://mail.google.com/mail/u/0/?tf=cm&fs=1&to=rizafauji7@gmail.com" target="_blank">Email</a><br>
+├─ <a href="https://www.linkedin.com/in/riza221/" target="_blank">LinkedIn</a><br>
+├─ <a href="https://wa.me/6282132746345" target="_blank">WhatsApp</a><br>
+├─ <a href="https://t.me/rizax_fauz" target="_blank">Telegram</a><br>
+├─ <a href="https://medium.com/@rizafauziaja" target="_blank">Medium</a><br>
+├─ <a href="https://farcaster.xyz/riza221" target="_blank">Farcaster</a><br>
+└─ dino (play game)
 </div>
 
 <div class="terminal">
@@ -122,7 +142,6 @@ Visits: <span id="visits">Loading...</span>
 <div id="dino"></div>
 <div id="cactus"></div>
 </div>
-
 </div>
 </div>
 
@@ -148,45 +167,21 @@ fetch("https://api.countapi.xyz/hit/rizafauji.dev/visits")
 .then(data=>document.getElementById("visits").textContent=data.value)
 .catch(()=>document.getElementById("visits").textContent="Error");
 
-/* TERMINAL */
+/* TERMINAL COMMAND */
 const input=document.getElementById("command");
 const output=document.getElementById("output");
 const gameBox=document.getElementById("gameBox");
 
 const commands={
-
-help:"Available: help, about, projects, contact, email, linkedin, whatsapp, telegram, medium, farcaster, clear, dino",
-
+help:"Available: help, about, projects, clear, dino",
 about:"Riza Fauji - Developer focused on frontend & backend systems.",
-
-projects:"1. Terminal Portfolio\n2. System Monitor UI\n3. Web Experiments",
-
-contact:
-`┌─ Contact List
-├─ <a href="https://mail.google.com/mail/u/0/?tf=cm&fs=1&to=rizafauji7@gmail.com" target="_blank">Email</a>
-├─ <a href="https://www.linkedin.com/in/riza221/" target="_blank">LinkedIn</a>
-├─ <a href="https://wa.me/6282132746345" target="_blank">WhatsApp</a>
-├─ <a href="https://t.me/rizax_fauz" target="_blank">Telegram</a>
-├─ <a href="https://medium.com/@rizafauziaja" target="_blank">Medium</a>
-├─ <a href="https://farcaster.xyz/riza221" target="_blank">Farcaster</a>
-└─ dino (play game)`,
-
-email:`<a href="https://mail.google.com/mail/u/0/?tf=cm&fs=1&to=rizafauji7@gmail.com" target="_blank">Open Gmail</a>`,
-
-linkedin:`<a href="https://www.linkedin.com/in/riza221/" target="_blank">Open LinkedIn</a>`,
-
-whatsapp:`<a href="https://wa.me/6282132746345" target="_blank">Open WhatsApp</a>`,
-
-telegram:`<a href="https://t.me/rizax_fauz" target="_blank">Open Telegram</a>`,
-
-medium:`<a href="https://medium.com/@rizafauziaja" target="_blank">Open Medium</a>`,
-
-farcaster:`<a href="https://farcaster.xyz/riza221" target="_blank">Open Farcaster</a>`
+projects:"1. Terminal Portfolio\n2. System Monitor UI\n3. Web Experiments"
 };
 
 input.addEventListener("keydown",function(e){
 if(e.key==="Enter"){
 const cmd=input.value.trim().toLowerCase();
+
 const line=document.createElement("div");
 line.textContent="user@riza:~$ "+cmd;
 output.appendChild(line);
@@ -200,7 +195,7 @@ output.innerHTML="";
 }
 else{
 const res=document.createElement("div");
-res.innerHTML=commands[cmd]||"Command not found.";
+res.textContent=commands[cmd]||"Command not found.";
 output.appendChild(res);
 }
 
