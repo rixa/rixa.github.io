@@ -11,7 +11,7 @@ body{
   background:black;
   color:#00ff99;
   font-family:monospace;
-  overflow-x:hidden;
+  overflow:hidden;
 }
 
 /* BOOTSCREEN */
@@ -71,6 +71,8 @@ body::after{
   padding:25px;
   max-width:900px;
   margin:auto;
+  overflow-y:auto;
+  height:100vh;
 }
 .title{ font-size:20px; margin-bottom:25px; }
 
@@ -188,7 +190,7 @@ user@riza:~$ contact<br>
 
 <div class="terminal">
 <div id="output"></div>
-<div>user@riza:~$ <input id="command" autofocus></div>
+<div>user@riza:~$ <input id="command"></div>
 
 <div id="gameBox">
 <div id="score">Score: 0</div>
@@ -200,10 +202,11 @@ user@riza:~$ contact<br>
 
 <script>
 
-/* BOOT ANIMATION */
+/* BOOT */
 const bootText=document.getElementById("bootText");
 const countdownEl=document.getElementById("countdown");
 const bootScreen=document.getElementById("bootScreen");
+const input=document.getElementById("command");
 
 const lines=["Initializing system...","Loading modules...","Boot sequence..."];
 let i=0;
@@ -228,7 +231,14 @@ countdownEl.textContent=count;
 }else{
 clearInterval(interval);
 countdownEl.textContent="ACCESS GRANTED";
-setTimeout(()=>bootScreen.classList.add("fadeOut"),1000);
+setTimeout(()=>{
+bootScreen.classList.add("fadeOut");
+setTimeout(()=>{
+bootScreen.style.display="none";
+document.body.style.overflow="auto";
+input.focus();
+},1000);
+},800);
 }
 },800);
 }
@@ -256,16 +266,13 @@ fetch("https://api.countapi.xyz/hit/rizafauji.dev/visits")
 .catch(()=>document.getElementById("visits").textContent="Error");
 
 /* TERMINAL */
-const input=document.getElementById("command");
 const output=document.getElementById("output");
 const gameBox=document.getElementById("gameBox");
 
 input.addEventListener("keydown",function(e){
 if(e.key==="Enter"){
 const cmd=input.value.trim().toLowerCase();
-const line=document.createElement("div");
-line.textContent="user@riza:~$ "+cmd;
-output.appendChild(line);
+output.innerHTML+="<div>user@riza:~$ "+cmd+"</div>";
 
 if(cmd==="dino") startGame();
 else if(cmd==="clear") output.innerHTML="";
@@ -287,7 +294,7 @@ if(jumping)return;
 jumping=true;
 let up=0;
 let jumpUp=setInterval(()=>{
-if(up>=60){
+if(up>=70){
 clearInterval(jumpUp);
 let down=setInterval(()=>{
 if(up<=0){clearInterval(down);jumping=false;}
@@ -302,26 +309,31 @@ dino.style.bottom=up+"px";
 
 document.addEventListener("keydown",function(e){
 if(gameBox.style.display==="block"){
-if(e.code==="Space") jump();
+if(e.code==="Space"){ e.preventDefault(); jump(); }
 if(e.code==="Escape") stopGame();
 }
 });
 
 function startGame(){
+if(gameBox.style.display==="block") return;
+
 gameBox.style.display="block";
 score=0;
 scoreEl.textContent="Score: 0";
 cactus.style.right="-20px";
 
 gameInterval=setInterval(()=>{
-let cactusLeft=parseInt(window.getComputedStyle(cactus).getPropertyValue("right"));
-cactus.style.right=(cactusLeft+speed)+"px";
-let dinoBottom=parseInt(window.getComputedStyle(dino).getPropertyValue("bottom"));
-if(cactusLeft>540 && cactusLeft<580 && dinoBottom<20){
+let cactusPos=600-parseInt(cactus.style.right||-20);
+let dinoBottom=parseInt(window.getComputedStyle(dino).bottom);
+
+cactus.style.right=(parseInt(cactus.style.right||-20)+speed)+"px";
+
+if(cactusPos>30 && cactusPos<60 && dinoBottom<25){
 alert("GAME OVER");
 stopGame();
 }
-if(cactusLeft>620) cactus.style.right="-20px";
+
+if(parseInt(cactus.style.right)>620) cactus.style.right="-20px";
 },20);
 
 scoreInterval=setInterval(()=>{
