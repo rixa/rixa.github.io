@@ -253,7 +253,18 @@ let visits=localStorage.getItem("riza_visits")||0;
 visits++;
 localStorage.setItem("riza_visits",visits);
 document.getElementById("visits").textContent=visits;
-
+document.getElementById("visits").textContent=visits;
+  /* GET PUBLIC IP */
+window.addEventListener("load", function(){
+  fetch("https://api.ipify.org?format=json")
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("ip").textContent = data.ip;
+    })
+    .catch(() => {
+      document.getElementById("ip").textContent = "Unavailable";
+    });
+});
 /* SKILL LOOP ANIMATION */
 function startBarLoop(){
 setInterval(()=>{
