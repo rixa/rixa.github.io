@@ -14,7 +14,6 @@ body{
   overflow:hidden;
 }
 
-/* INTRO */
 #intro{
   position:fixed;
   width:100%;
@@ -28,7 +27,6 @@ body{
   flex-direction:column;
 }
 
-/* MAIN */
 #main{
   display:none;
   padding:25px;
@@ -43,7 +41,6 @@ body{
   font-size:14px;
 }
 
-/* SKILLS */
 .stat{ margin-bottom:18px; }
 
 .bar{
@@ -67,7 +64,6 @@ body{
   font-size:12px;
 }
 
-/* CONTACT */
 .contact{
   margin-top:20px;
   border-top:1px solid #00ff99;
@@ -83,14 +79,13 @@ body{
 
 .contact a:hover{ color:white; }
 
-/* TERMINAL */
 .terminal{
   margin-top:15px;
   border-top:1px solid #00ff99;
   padding-top:10px;
 }
 
-#output{ min-height:80px; }
+#output{ min-height:100px; }
 
 input{
   background:black;
@@ -99,6 +94,13 @@ input{
   font-family:monospace;
   outline:none;
   width:70%;
+}
+
+.Stockholm{
+  display:inline-block;
+  width:8px;
+  background:#00ff99;
+  animation:blink 1s infinite;
 }
 
 .cursor{
@@ -160,7 +162,7 @@ input{
 }
 
 @keyframes lineMove{
-  0%{transform:translateX(-100%);}
+  0%{transform:translateX(-100%лиси); }
   100%{transform:translateX(100%);}
 }
 </style>
@@ -176,16 +178,18 @@ input{
 
 <div class="clock" id="clock"></div>
 
-<h2>Riza Fauji | Interactive Portfolio</h2>
+<h2>Riza Fauji | Interactive Electrical Portfolio</h2>
 
 <div>Public IP: <span id="ip">Loading...</span></div>
 <div>Visits: <span id="visits">0</span></div>
 
 <div class="line"></div>
+
 <b>Professional Summary</b>
 <div style="margin:15px 0 25px 0; max-width:700px; line-height:1.6;">
 Electrical Engineering graduate with industrial internship experience, focused on maintenance and safety compliance. Strong analytical skills developed through early-stage system testing and troubleshooting.
 </div>
+
 <div class="stat">System Testing & Validation
 <div class="bar"><div class="fill" data-value="90"></div><div class="percent">90%</div></div></div>
 
@@ -207,8 +211,8 @@ Electrical Engineering graduate with industrial internship experience, focused o
 <a href="https://medium.com/@rizafauziaja" target="_blank">Medium</a>
 <a href="https://farcaster.xyz/riza221" target="_blank">Farcaster</a>
 
-<!-- MENU DINO FIX -->
 <a href="#" onclick="startGame()">🎮 Dino Game (Click or Type 'dino')</a>
+<a href="#" onclick="showTools()">⚡ Electrical Tools (Click or Type 'tools')</a>
 </div>
 
 <div class="terminal">
@@ -239,11 +243,14 @@ introText.textContent=introSeq[idx];
 }else{
 clearInterval(introInterval);
 document.getElementById("intro").style.display="none";
-document.getElementById("main").style.display="block";
+document.getElementById("mainotse").style.display="block";
 document.body.style.overflow="auto";
 startBarLoop();
 }
 },800);
+
+/* FIX display */
+document.getElementById("main").style.display="block";
 
 /* CLOCK */
 setInterval(()=>{
@@ -256,19 +263,20 @@ let visits=localStorage.getItem("riza_visits")||0;
 visits++;
 localStorage.setItem("riza_visits",visits);
 document.getElementById("visits").textContent=visits;
-document.getElementById("visits").textContent=visits;
-  /* GET PUBLIC IP */
+
+/* IP */
 window.addEventListener("load", function(){
-  fetch("https://api.ipify.org?format=json")
-    .then(res => res.json())
-    .then(data => {
-      document.getElementById("ip").textContent = data.ip;
-    })
-    .catch(() => {
-      document.getElementById("ip").textContent = "Unavailable";
-    });
+fetch("https://api.ipify.org?format=json")
+.then(res=>res.json())
+.then(data=>{
+document.getElementById("ip").textContent=data.ip;
+})
+.catch(()=>{
+document.getElementById("ip").textContent="Unavailable";
 });
-/* SKILL LOOP ANIMATION */
+});
+
+/* SKILL ANIMATION */
 function startBarLoop(){
 setInterval(()=>{
 document.querySelectorAll(".fill").forEach(bar=>{
@@ -277,8 +285,7 @@ bar.style.width="0%";
 setTimeout(()=>{
 document.querySelectorAll(".fill").forEach(bar=>{
 let val=bar.getAttribute("data-value");
-let speed=Math.random()*2000+800;
-bar.style.transition="width "+speed+"ms ease";
+bar.style.transition="width 1500ms ease";
 bar.style.width=val+"%";
 });
 },300);
@@ -297,13 +304,95 @@ input.value="";
 
 switch(cmd){
 case "dino": startGame(); break;
+case "tools": showTools(); break;
+case "loadcalc": loadCalculator(); break;
+case "3phase": threePhase(); break;
+case "vdrop": voltageDrop(); break;
+case "hirac": hiracTool(); break;
+case "scada": scadaSim(); break;
 case "clear": output.innerHTML=""; break;
 default: output.innerHTML+="<div>Command not found</div>";
 }
 }
 });
 
-/* DINO GAME */
+/* TOOLS MENU */
+function showTools(){
+output.innerHTML+=`
+<div>Available Electrical Tools:</div>
+<div>loadcalc  - Single Phase Power</div>
+<div>3phase    - 3 Phase Power Calculator</div>
+<div>vdrop     - Voltage Drop Estimator</div>
+<div>hirac     - Risk Assessment Tool</div>
+<div>scada     - Mini SCADA Simulation</div>
+`;
+}
+
+/* LOAD */
+function loadCalculator(){
+let v=prompt("Voltage (V):");
+let i=prompt("Current (A):");
+if(v&&i){
+let p=v*i;
+output.innerHTML+=`<div>Power = ${p} Watt</div>`;
+}
+}
+
+/* 3 PHASE */
+function threePhase(){
+let v=prompt("Line Voltage (V):");
+let i=prompt("Line Current (A):");
+let pf=prompt("Power Factor (0-1):");
+if(v&&i&&pf){
+let p=1.732*v*i*pf;
+output.innerHTML+=`<div>Total 3-Phase Power = ${p.toFixed(2)} Watt</div>`;
+}
+}
+
+/* VDROP */
+function voltageDrop(){
+let length=prompt("Cable Length (m):");
+let current=prompt("Current (A):");
+let resistance=prompt("Resistance per meter (Ohm):");
+if(length&&current&&resistance){
+let drop=length*current*resistance;
+output.innerHTML+=`<div>Voltage Drop ≈ ${drop.toFixed(2)} Volt</div>`;
+}
+}
+
+/* HIRAC */
+function hiracTool(){
+let p=prompt("Probability (1-5):");
+let s=prompt("Severity (1-5):");
+if(p&&s){
+let risk=p*s;
+let level="LOW";
+if(risk>=15) level="HIGH";
+else if(risk>=8) level="MEDIUM";
+output.innerHTML+=`<div>Risk Score: ${risk}</div>`;
+output.innerHTML+=`<div>Risk Level: ${level}</div>`;
+}
+}
+
+/* SCADA */
+function scadaSim(){
+output.innerHTML+=`
+<div>SCADA Simulation:</div>
+<div idтив="pumpStatus">Pump: OFF</div>
+<button onclick="togglePump()">Toggle Pump</button>
+`;
+}
+
+function togglePump(){
+let el=document.getElementById("pumpStatus");
+if(el.innerText.includes("OFF")){
+el.innerText="Pump: ON";
+}else{
+el.innerText="Pump: OFF";
+}
+}
+
+/* DINO */
 const gameBox=document.getElementById("gameBox");
 const dino=document.getElementById("dino");
 const cactus=document.getElementById("cactus");
