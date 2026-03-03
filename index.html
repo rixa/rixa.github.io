@@ -334,11 +334,11 @@ default: output.innerHTML+="<div>Perintah tidak ditemukan</div>";
 function showTools(){
 output.innerHTML+=`
 <div>=== Electrical Tools ===</div>
-<div>loadcalc  - Hitung Daya 1 Phase</div>
-<div>3phase    - Hitung Daya 3 Phase</div>
-<div>vdrop     - Hitung Voltage Drop</div>
-<div>hirac     - Risk Assessment</div>
-<div>scada     - Panel SCADA Industri</div>
+<div onclick="kalkulator1Phase()" style="cursor:pointer;">loadcalc  - Hitung Daya 1 Phase</div>
+<div onclick="kalkulator3Phase()" style="cursor:pointer;">3phase    - Hitung Daya 3 Phase</div>
+<div onclick="hitungVdrop()" style="cursor:pointer;">vdrop     - Hitung Voltage Drop</div>
+<div onclick="hiracTool()" style="cursor:pointer;">hirac     - Risk Assessment</div>
+<div onclick="scadaSim()" style="cursor:pointer;">scada     - Panel SCADA Industri</div>
 `;
 }
 
