@@ -96,13 +96,6 @@ input{
   width:70%;
 }
 
-.Stockholm{
-  display:inline-block;
-  width:8px;
-  background:#00ff99;
-  animation:blink 1s infinite;
-}
-
 .cursor{
   display:inline-block;
   width:8px;
@@ -162,7 +155,7 @@ input{
 }
 
 @keyframes lineMove{
-  0%{transform:translateX(-100%лиси); }
+  0%{transform:translateX(-100%);}
   100%{transform:translateX(100%);}
 }
 </style>
@@ -243,14 +236,11 @@ introText.textContent=introSeq[idx];
 }else{
 clearInterval(introInterval);
 document.getElementById("intro").style.display="none";
-document.getElementById("mainotse").style.display="block";
+document.getElementById("main").style.display="block";
 document.body.style.overflow="auto";
 startBarLoop();
 }
 },800);
-
-/* FIX display */
-document.getElementById("main").style.display="block";
 
 /* CLOCK */
 setInterval(()=>{
@@ -276,7 +266,7 @@ document.getElementById("ip").textContent="Unavailable";
 });
 });
 
-/* SKILL ANIMATION */
+/* SKILL ANIMATION (acak & cepat) */
 function startBarLoop(){
 setInterval(()=>{
 document.querySelectorAll(".fill").forEach(bar=>{
@@ -285,11 +275,12 @@ bar.style.width="0%";
 setTimeout(()=>{
 document.querySelectorAll(".fill").forEach(bar=>{
 let val=bar.getAttribute("data-value");
-bar.style.transition="width 1500ms ease";
+let speed=Math.random()*1500+500;
+bar.style.transition="width "+speed+"ms ease";
 bar.style.width=val+"%";
 });
-},300);
-},4000);
+},200);
+},3500);
 }
 
 /* TERMINAL */
@@ -305,80 +296,75 @@ input.value="";
 switch(cmd){
 case "dino": startGame(); break;
 case "tools": showTools(); break;
-case "loadcalc": loadCalculator(); break;
-case "3phase": threePhase(); break;
-case "vdrop": voltageDrop(); break;
+case "loadcalc": kalkulator1Phase(); break;
+case "3phase": kalkulator3Phase(); break;
+case "vdrop": hitungVdrop(); break;
 case "hirac": hiracTool(); break;
 case "scada": scadaSim(); break;
 case "clear": output.innerHTML=""; break;
-default: output.innerHTML+="<div>Command not found</div>";
+default: output.innerHTML+="<div>Command tidak ditemukan</div>";
 }
 }
 });
 
-/* TOOLS MENU */
+/* TOOLS */
 function showTools(){
 output.innerHTML+=`
-<div>Available Electrical Tools:</div>
-<div>loadcalc  - Single Phase Power</div>
-<div>3phase    - 3 Phase Power Calculator</div>
-<div>vdrop     - Voltage Drop Estimator</div>
-<div>hirac     - Risk Assessment Tool</div>
-<div>scada     - Mini SCADA Simulation</div>
+<div>=== Electrical Tools ===</div>
+<div>loadcalc  - Hitung Daya 1 Phase</div>
+<div>3phase    - Hitung Daya 3 Phase</div>
+<div>vdrop     - Hitung Voltage Drop</div>
+<div>hirac     - Risk Assessment</div>
+<div>scada     - Mini SCADA</div>
 `;
 }
 
-/* LOAD */
-function loadCalculator(){
-let v=prompt("Voltage (V):");
-let i=prompt("Current (A):");
+function kalkulator1Phase(){
+let v=prompt("Masukkan Tegangan (Volt):");
+let i=prompt("Masukkan Arus (Ampere):");
 if(v&&i){
 let p=v*i;
-output.innerHTML+=`<div>Power = ${p} Watt</div>`;
+output.innerHTML+=`<div>Daya = ${p} Watt</div>`;
 }
 }
 
-/* 3 PHASE */
-function threePhase(){
-let v=prompt("Line Voltage (V):");
-let i=prompt("Line Current (A):");
-let pf=prompt("Power Factor (0-1):");
+function kalkulator3Phase(){
+let v=prompt("Masukkan Tegangan Line (Volt):");
+let i=prompt("Masukkan Arus Line (Ampere):");
+let pf=prompt("Masukkan Faktor Daya (0 - 1):");
 if(v&&i&&pf){
 let p=1.732*v*i*pf;
-output.innerHTML+=`<div>Total 3-Phase Power = ${p.toFixed(2)} Watt</div>`;
+output.innerHTML+=`<div>Total Daya 3 Phase = ${p.toFixed(2)} Watt</div>`;
 }
 }
 
-/* VDROP */
-function voltageDrop(){
-let length=prompt("Cable Length (m):");
-let current=prompt("Current (A):");
-let resistance=prompt("Resistance per meter (Ohm):");
-if(length&&current&&resistance){
-let drop=length*current*resistance;
-output.innerHTML+=`<div>Voltage Drop ≈ ${drop.toFixed(2)} Volt</div>`;
+function hitungVdrop(){
+let l=prompt("Panjang Kabel (meter):");
+let i=prompt("Arus (Ampere):");
+let r=prompt("Resistansi per meter (Ohm):");
+if(l&&i&&r){
+let drop=l*i*r;
+output.innerHTML+=`<div>Perkiraan Voltage Drop = ${drop.toFixed(2)} Volt</div>`;
 }
 }
 
-/* HIRAC */
 function hiracTool(){
-let p=prompt("Probability (1-5):");
+let p=prompt("Probabilitas (1-5):");
 let s=prompt("Severity (1-5):");
 if(p&&s){
 let risk=p*s;
-let level="LOW";
-if(risk>=15) level="HIGH";
-else if(risk>=8) level="MEDIUM";
+let level="RENDAH";
+if(risk>=15) level="TINGGI";
+else if(risk>=8) level="SEDANG";
 output.innerHTML+=`<div>Risk Score: ${risk}</div>`;
-output.innerHTML+=`<div>Risk Level: ${level}</div>`;
+output.innerHTML+=`<div>Level Risiko: ${level}</div>`;
 }
 }
 
-/* SCADA */
 function scadaSim(){
 output.innerHTML+=`
-<div>SCADA Simulation:</div>
-<div idтив="pumpStatus">Pump: OFF</div>
+<div>=== SCADA Simulation ===</div>
+<div id="pumpStatus">Pump: OFF</div>
 <button onclick="togglePump()">Toggle Pump</button>
 `;
 }
@@ -392,7 +378,7 @@ el.innerText="Pump: OFF";
 }
 }
 
-/* DINO */
+/* DINO (tidak berubah) */
 const gameBox=document.getElementById("gameBox");
 const dino=document.getElementById("dino");
 const cactus=document.getElementById("cactus");
