@@ -85,7 +85,7 @@ body{
   padding-top:10px;
 }
 
-#output{ min-height:100px; }
+#output{ min-height:120px; }
 
 input{
   background:black;
@@ -158,6 +158,39 @@ input{
   0%{transform:translateX(-100%);}
   100%{transform:translateX(100%);}
 }
+
+/* SCADA */
+.scada-box{
+  margin-top:10px;
+  padding:10px;
+  border:1px solid #00ff99;
+}
+
+.tank{
+  width:80px;
+  height:150px;
+  border:2px solid #00ff99;
+  position:relative;
+  margin-top:10px;
+}
+
+.tank-fill{
+  position:absolute;
+  bottom:0;
+  width:100%;
+  height:0%;
+  background:#00ff99;
+}
+
+.alarm{
+  margin-top:8px;
+  font-weight:bold;
+}
+
+.alarm.red{
+  color:red;
+  animation:blink 0.6s infinite;
+}
 </style>
 </head>
 
@@ -184,16 +217,16 @@ Electrical Engineering graduate with industrial internship experience, focused o
 </div>
 
 <div class="stat">System Testing & Validation
-<div class="bar"><div class="fill" data-value="90"></div><div class="percent">90%</div></div></div>
+<div class="bar"><div class="fill" data-value="90"></div></div></div>
 
 <div class="stat">Process Automation
-<div class="bar"><div class="fill" data-value="85"></div><div class="percent">85%</div></div></div>
+<div class="bar"><div class="fill" data-value="85"></div></div></div>
 
 <div class="stat">Digital & Technical Research
-<div class="bar"><div class="fill" data-value="88"></div><div class="percent">88%</div></div></div>
+<div class="bar"><div class="fill" data-value="88"></div></div></div>
 
 <div class="stat">Analytical Problem Solving
-<div class="bar"><div class="fill" data-value="80"></div><div class="percent">80%</div></div></div>
+<div class="bar"><div class="fill" data-value="80"></div></div></div>
 
 <div class="contact">
 <b>Contact:</b>
@@ -204,8 +237,8 @@ Electrical Engineering graduate with industrial internship experience, focused o
 <a href="https://medium.com/@rizafauziaja" target="_blank">Medium</a>
 <a href="https://farcaster.xyz/riza221" target="_blank">Farcaster</a>
 
-<a href="#" onclick="startGame()">🎮 Dino Game (Click or Type 'dino')</a>
-<a href="#" onclick="showTools()">⚡ Electrical Tools (Click or Type 'tools')</a>
+<a href="#" onclick="startGame()">🎮 Dino Game</a>
+<a href="#" onclick="showTools()">⚡ Electrical Tools</a>
 </div>
 
 <div class="terminal">
@@ -266,21 +299,25 @@ document.getElementById("ip").textContent="Unavailable";
 });
 });
 
-/* SKILL ANIMATION (acak & cepat) */
+/* SKILL ANIMATION INDUSTRIAL */
 function startBarLoop(){
+const bars=document.querySelectorAll(".fill");
+bars.forEach((bar,i)=>{
+let max=parseInt(bar.getAttribute("data-value"));
+let current=0;
+let dir=1;
+
 setInterval(()=>{
-document.querySelectorAll(".fill").forEach(bar=>{
-bar.style.width="0%";
+if(dir===1){
+current+=0.4;
+if(current>=max) dir=-1;
+}else{
+current-=0.4;
+if(current<=max-15) dir=1;
+}
+bar.style.width=current+"%";
+},20 + (i*5));
 });
-setTimeout(()=>{
-document.querySelectorAll(".fill").forEach(bar=>{
-let val=bar.getAttribute("data-value");
-let speed=Math.random()*1500+500;
-bar.style.transition="width "+speed+"ms ease";
-bar.style.width=val+"%";
-});
-},200);
-},3500);
 }
 
 /* TERMINAL */
@@ -296,86 +333,88 @@ input.value="";
 switch(cmd){
 case "dino": startGame(); break;
 case "tools": showTools(); break;
-case "loadcalc": kalkulator1Phase(); break;
-case "3phase": kalkulator3Phase(); break;
-case "vdrop": hitungVdrop(); break;
-case "hirac": hiracTool(); break;
 case "scada": scadaSim(); break;
 case "clear": output.innerHTML=""; break;
-default: output.innerHTML+="<div>Command tidak ditemukan</div>";
+default: output.innerHTML+="<div>Perintah tidak ditemukan</div>";
 }
 }
 });
 
-/* TOOLS */
 function showTools(){
 output.innerHTML+=`
 <div>=== Electrical Tools ===</div>
-<div>loadcalc  - Hitung Daya 1 Phase</div>
-<div>3phase    - Hitung Daya 3 Phase</div>
-<div>vdrop     - Hitung Voltage Drop</div>
-<div>hirac     - Risk Assessment</div>
-<div>scada     - Mini SCADA</div>
+<div>scada - Panel SCADA Industri</div>
 `;
 }
 
-function kalkulator1Phase(){
-let v=prompt("Masukkan Tegangan (Volt):");
-let i=prompt("Masukkan Arus (Ampere):");
-if(v&&i){
-let p=v*i;
-output.innerHTML+=`<div>Daya = ${p} Watt</div>`;
-}
-}
-
-function kalkulator3Phase(){
-let v=prompt("Masukkan Tegangan Line (Volt):");
-let i=prompt("Masukkan Arus Line (Ampere):");
-let pf=prompt("Masukkan Faktor Daya (0 - 1):");
-if(v&&i&&pf){
-let p=1.732*v*i*pf;
-output.innerHTML+=`<div>Total Daya 3 Phase = ${p.toFixed(2)} Watt</div>`;
-}
-}
-
-function hitungVdrop(){
-let l=prompt("Panjang Kabel (meter):");
-let i=prompt("Arus (Ampere):");
-let r=prompt("Resistansi per meter (Ohm):");
-if(l&&i&&r){
-let drop=l*i*r;
-output.innerHTML+=`<div>Perkiraan Voltage Drop = ${drop.toFixed(2)} Volt</div>`;
-}
-}
-
-function hiracTool(){
-let p=prompt("Probabilitas (1-5):");
-let s=prompt("Severity (1-5):");
-if(p&&s){
-let risk=p*s;
-let level="RENDAH";
-if(risk>=15) level="TINGGI";
-else if(risk>=8) level="SEDANG";
-output.innerHTML+=`<div>Risk Score: ${risk}</div>`;
-output.innerHTML+=`<div>Level Risiko: ${level}</div>`;
-}
-}
+/* SCADA INDUSTRIAL */
+let scadaInterval=null;
+let pumpOn=false;
+let flow=0;
+let tank=0;
+let voltage=220;
 
 function scadaSim(){
+
+if(scadaInterval!==null) return;
+
 output.innerHTML+=`
-<div>=== SCADA Simulation ===</div>
+<div class="scada-box">
+<div><b>=== PANEL SCADA ===</b></div>
 <div id="pumpStatus">Pump: OFF</div>
+<div id="flowStatus">Flow Rate: 0 L/min</div>
+<div id="voltStatus">Tegangan: 220 V</div>
+<div class="tank"><div id="tankFill" class="tank-fill"></div></div>
+<div id="alarmBox" class="alarm">Status: Normal</div>
 <button onclick="togglePump()">Toggle Pump</button>
+<div id="ladderBox">PLC: --| |----( )--</div>
+</div>
 `;
+
+scadaInterval=setInterval(updateScada,500);
 }
 
 function togglePump(){
-let el=document.getElementById("pumpStatus");
-if(el.innerText.includes("OFF")){
-el.innerText="Pump: ON";
-}else{
-el.innerText="Pump: OFF";
+pumpOn=!pumpOn;
+document.getElementById("pumpStatus").innerText=
+"Pump: "+(pumpOn?"ON":"OFF");
 }
+
+function updateScada(){
+
+if(pumpOn){
+flow+=Math.random()*8;
+if(flow>100) flow=100;
+tank+=flow*0.02;
+if(tank>100) tank=100;
+}else{
+flow-=5;
+if(flow<0) flow=0;
+tank-=2;
+if(tank<0) tank=0;
+}
+
+voltage=220+(Math.random()*10-5);
+
+document.getElementById("flowStatus").innerText=
+"Flow Rate: "+flow.toFixed(1)+" L/min";
+
+document.getElementById("voltStatus").innerText=
+"Tegangan: "+voltage.toFixed(1)+" V";
+
+document.getElementById("tankFill").style.height=tank+"%";
+
+let alarm=document.getElementById("alarmBox");
+if(flow>90){
+alarm.innerText="ALARM: Flow Terlalu Tinggi!";
+alarm.classList.add("red");
+}else{
+alarm.innerText="Status: Normal";
+alarm.classList.remove("red");
+}
+
+document.getElementById("ladderBox").innerText=
+pumpOn?"PLC: --| |----(ON)--":"PLC: --|/|----(OFF)--";
 }
 
 /* DINO (tidak berubah) */
@@ -425,7 +464,7 @@ if(cactusPos<-20){
 cactus.style.right="-20px";
 speed+=0.5;
 }else{
-cactus.style.right=(parseInt(getComputedStyle(cactus).right)+speed)+"px";
+cactus.style.right=(parseInt(getComputedStyle(cactus).right))+speed+"px";
 }
 
 let dinoBottom=parseInt(getComputedStyle(dino).bottom);
