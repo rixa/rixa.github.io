@@ -57,13 +57,6 @@ body{
   background:#00ff99;
 }
 
-.percent{
-  position:absolute;
-  right:8px;
-  top:0;
-  font-size:12px;
-}
-
 .contact{
   margin-top:20px;
   border-top:1px solid #00ff99;
@@ -299,24 +292,18 @@ document.getElementById("ip").textContent="Unavailable";
 });
 });
 
-/* SKILL ANIMATION INDUSTRIAL */
+/* SKILL ANIMATION */
 function startBarLoop(){
-const bars=document.querySelectorAll(".fill");
-bars.forEach((bar,i)=>{
-let max=parseInt(bar.getAttribute("data-value"));
+document.querySelectorAll(".fill").forEach((bar,i)=>{
+let max=parseInt(bar.dataset.value);
 let current=0;
 let dir=1;
-
 setInterval(()=>{
-if(dir===1){
-current+=0.4;
+current+=dir*0.4;
 if(current>=max) dir=-1;
-}else{
-current-=0.4;
 if(current<=max-15) dir=1;
-}
 bar.style.width=current+"%";
-},20 + (i*5));
+},20+(i*5));
 });
 }
 
@@ -333,6 +320,10 @@ input.value="";
 switch(cmd){
 case "dino": startGame(); break;
 case "tools": showTools(); break;
+case "loadcalc": kalkulator1Phase(); break;
+case "3phase": kalkulator3Phase(); break;
+case "vdrop": hitungVdrop(); break;
+case "hirac": hiracTool(); break;
 case "scada": scadaSim(); break;
 case "clear": output.innerHTML=""; break;
 default: output.innerHTML+="<div>Perintah tidak ditemukan</div>";
@@ -343,27 +334,67 @@ default: output.innerHTML+="<div>Perintah tidak ditemukan</div>";
 function showTools(){
 output.innerHTML+=`
 <div>=== Electrical Tools ===</div>
-<div>scada - Panel SCADA Industri</div>
+<div>loadcalc  - Hitung Daya 1 Phase</div>
+<div>3phase    - Hitung Daya 3 Phase</div>
+<div>vdrop     - Hitung Voltage Drop</div>
+<div>hirac     - Risk Assessment</div>
+<div>scada     - Panel SCADA Industri</div>
 `;
 }
 
-/* SCADA INDUSTRIAL */
+/* TOOLS */
+function kalkulator1Phase(){
+let v=prompt("Masukkan Tegangan (Volt):");
+let i=prompt("Masukkan Arus (Ampere):");
+if(v && i){
+output.innerHTML+=`<div>Daya = ${v*i} Watt</div>`;
+}
+}
+
+function kalkulator3Phase(){
+let v=prompt("Masukkan Tegangan Line (Volt):");
+let i=prompt("Masukkan Arus Line (Ampere):");
+let pf=prompt("Masukkan Faktor Daya (0 - 1):");
+if(v && i && pf){
+let p=1.732*v*i*pf;
+output.innerHTML+=`<div>Total Daya 3 Phase = ${p.toFixed(2)} Watt</div>`;
+}
+}
+
+function hitungVdrop(){
+let l=prompt("Panjang Kabel (meter):");
+let i=prompt("Arus (Ampere):");
+let r=prompt("Resistansi per meter (Ohm):");
+if(l && i && r){
+output.innerHTML+=`<div>Voltage Drop = ${(l*i*r).toFixed(2)} Volt</div>`;
+}
+}
+
+function hiracTool(){
+let p=prompt("Probabilitas (1-5):");
+let s=prompt("Severity (1-5):");
+if(p && s){
+let risk=p*s;
+let level=risk>=15?"TINGGI":risk>=8?"SEDANG":"RENDAH";
+output.innerHTML+=`<div>Risk Score: ${risk}</div>`;
+output.innerHTML+=`<div>Level Risiko: ${level}</div>`;
+}
+}
+
+/* SCADA */
 let scadaInterval=null;
 let pumpOn=false;
 let flow=0;
 let tank=0;
-let voltage=220;
 
 function scadaSim(){
-
-if(scadaInterval!==null) return;
+if(scadaInterval) return;
 
 output.innerHTML+=`
 <div class="scada-box">
 <div><b>=== PANEL SCADA ===</b></div>
 <div id="pumpStatus">Pump: OFF</div>
 <div id="flowStatus">Flow Rate: 0 L/min</div>
-<div id="voltStatus">Tegangan: 220 V</div>
 <div class="tank"><div id="tankFill" class="tank-fill"></div></div>
 <div id="alarmBox" class="alarm">Status: Normal</div>
 <button onclick="togglePump()">Toggle Pump</button>
@@ -381,26 +412,16 @@ document.getElementById("pumpStatus").innerText=
 }
 
 function updateScada(){
-
 if(pumpOn){
-flow+=Math.random()*8;
-if(flow>100) flow=100;
-tank+=flow*0.02;
-if(tank>100) tank=100;
+flow=Math.min(flow+Math.random()*8,100);
+tank=Math.min(tank+flow*0.02,100);
 }else{
-flow-=5;
-if(flow<0) flow=0;
-tank-=2;
-if(tank<0) tank=0;
+flow=Math.max(flow-5,0);
+tank=Math.max(tank-2,0);
 }
-
-voltage=220+(Math.random()*10-5);
 
 document.getElementById("flowStatus").innerText=
 "Flow Rate: "+flow.toFixed(1)+" L/min";
-
-document.getElementById("voltStatus").innerText=
-"Tegangan: "+voltage.toFixed(1)+" V";
 
 document.getElementById("tankFill").style.height=tank+"%";
 
@@ -417,7 +438,7 @@ document.getElementById("ladderBox").innerText=
 pumpOn?"PLC: --| |----(ON)--":"PLC: --|/|----(OFF)--";
 }
 
-/* DINO (tidak berubah) */
+/* DINO */
 const gameBox=document.getElementById("gameBox");
 const dino=document.getElementById("dino");
 const cactus=document.getElementById("cactus");
@@ -453,6 +474,9 @@ if(e.code==="Space"){e.preventDefault();jump();}
 });
 
 function startGame(){
+if(gameInterval) clearInterval(gameInterval);
+if(scoreInterval) clearInterval(scoreInterval);
+
 gameBox.style.display="block";
 score=0;
 speed=5;
