@@ -208,6 +208,7 @@ input{
 <div style="margin:15px 0 25px 0; max-width:700px; line-height:1.6;">
 Electrical Engineering graduate with industrial internship experience, focused on maintenance and safety compliance. Strong analytical skills developed through early-stage system testing and troubleshooting.
 </div>
+
 <div class="stat">System Testing & Validation
 <div class="bar"><div class="fill" data-value="90"></div></div></div>
 
@@ -324,10 +325,6 @@ case "3phase": kalkulator3Phase(); break;
 case "vdrop": hitungVdrop(); break;
 case "hirac": hiracTool(); break;
 case "scada": scadaSim(); break;
-case "risklvl": riskMatrix(); break;
-case "loto": lotoTool(); break;
-case "ppe": ppeTool(); break;
-case "jha": jhaTool(); break;
 case "clear": output.innerHTML=""; break;
 default: output.innerHTML+="<div>Perintah tidak ditemukan</div>";
 }
@@ -342,16 +339,10 @@ output.innerHTML+=`
 <div onclick="hitungVdrop()" style="cursor:pointer;">vdrop     - Hitung Voltage Drop</div>
 <div onclick="hiracTool()" style="cursor:pointer;">hirac     - Risk Assessment</div>
 <div onclick="scadaSim()" style="cursor:pointer;">scada     - Panel SCADA Industri</div>
-
-<div>=== K3 Tools ===</div>
-<div onclick="riskMatrix()" style="cursor:pointer;">risklvl  - Kalkulator Matriks Risiko</div>
-<div onclick="lotoTool()" style="cursor:pointer;">loto     - Checklist LOTO</div>
-<div onclick="ppeTool()" style="cursor:pointer;">ppe      - Rekomendasi APD</div>
-<div onclick="jhaTool()" style="cursor:pointer;">jha      - Analisa Bahaya Pekerjaan</div>
 `;
 }
 
-/* TOOLS (LAMA TETAP ADA) */
+/* TOOLS */
 function kalkulator1Phase(){
 let v=prompt("Masukkan Tegangan (Volt):");
 let i=prompt("Masukkan Arus (Ampere):");
@@ -390,74 +381,139 @@ output.innerHTML+=`<div>Level Risiko: ${level}</div>`;
 }
 }
 
-/* ================= K3 TOOLS ================= */
+/* SCADA */
+let scadaInterval=null;
+let pumpOn=false;
+let flow=0;
+let tank=0;
 
-function riskMatrix(){
-let s=prompt("Masukkan Severity (1-5):");
-let l=prompt("Masukkan Likelihood (1-5):");
-if(s && l){
-let score=s*l;
-let level="";
-let tindakan="";
+function scadaSim(){
+if(scadaInterval) return;
 
-if(score>=15){
-level="EKSTREM";
-tindakan="Hentikan pekerjaan dan lakukan pengendalian segera.";
-}else if(score>=8){
-level="TINGGI";
-tindakan="Perlu pengendalian tambahan sebelum bekerja.";
-}else if(score>=4){
-level="SEDANG";
-tindakan="Lakukan pengawasan dan SOP ketat.";
-}else{
-level="RENDAH";
-tindakan="Risiko dapat diterima dengan kontrol standar.";
-}
-
-output.innerHTML+=`<div>Skor Risiko: ${score}</div>`;
-output.innerHTML+=`<div>Level Risiko: ${level}</div>`;
-output.innerHTML+=`<div>Rekomendasi: ${tindakan}</div>`;
-}
-}
-
-function lotoTool(){
 output.innerHTML+=`
-<div>=== PROSEDUR LOTO ===</div>
-<div>1. Identifikasi semua sumber energi</div>
-<div>2. Matikan peralatan</div>
-<div>3. Isolasi sumber energi</div>
-<div>4. Pasang kunci dan tag</div>
-<div>5. Verifikasi tidak ada energi tersisa</div>
-<div>Status: Pastikan semua langkah dilakukan sebelum pekerjaan dimulai.</div>
+<div class="scada-box">
+<div><b>=== PANEL SCADA ===</b></div>
+<div id="pumpStatus">Pump: OFF</div>
+<div id="flowStatus">Flow Rate: 0 L/min</div>
+<div class="tank"><div id="tankFill" class="tank-fill"></div></div>
+<div id="alarmBox" class="alarm">Status: Normal</div>
+<button onclick="togglePump()">Toggle Pump</button>
+<div id="ladderBox">PLC: --| |----( )--</div>
+</div>
 `;
+
+scadaInterval=setInterval(updateScada,500);
 }
 
-function ppeTool(){
-let tegangan=prompt("Masukkan level tegangan kerja (Volt):");
-if(tegangan){
-let apd="";
-if(tegangan>1000){
-apd="Sarung tangan isolasi HV, face shield arc flash, baju tahan api, sepatu safety isolasi.";
-}else if(tegangan>220){
-apd="Sarung tangan isolasi, face shield, sepatu safety, helm proyek.";
+function togglePump(){
+pumpOn=!pumpOn;
+document.getElementById("pumpStatus").innerText=
+"Pump: "+(pumpOn?"ON":"OFF");
+}
+
+function updateScada(){
+if(pumpOn){
+flow=Math.min(flow+Math.random()*8,100);
+tank=Math.min(tank+flow*0.02,100);
 }else{
-apd="Sarung tangan kerja standar, helm proyek, sepatu safety.";
+flow=Math.max(flow-5,0);
+tank=Math.max(tank-2,0);
 }
 
-output.innerHTML+=`<div>Rekomendasi APD:</div>`;
-output.innerHTML+=`<div>${apd}</div>`;
-}
+document.getElementById("flowStatus").innerText=
+"Flow Rate: "+flow.toFixed(1)+" L/min";
+
+document.getElementById("tankFill").style.height=tank+"%";
+
+let alarm=document.getElementById("alarmBox");
+if(flow>90){
+alarm.innerText="ALARM: Flow Terlalu Tinggi!";
+alarm.classList.add("red");
+}else{
+alarm.innerText="Status: Normal";
+alarm.classList.remove("red");
 }
 
-function jhaTool(){
-let pekerjaan=prompt("Masukkan jenis pekerjaan:");
-if(pekerjaan){
-output.innerHTML+=`<div>=== ANALISA BAHAYA ===</div>`;
-output.innerHTML+=`<div>Pekerjaan: ${pekerjaan}</div>`;
-output.innerHTML+=`<div>Potensi Bahaya: Sengatan listrik, terpeleset, percikan api.</div>`;
-output.innerHTML+=`<div>Pengendalian: Gunakan APD lengkap, lakukan LOTO, pastikan area kering dan aman.</div>`;
+document.getElementById("ladderBox").innerText=
+pumpOn?"PLC: --| |----(ON)--":"PLC: --|/|----(OFF)--";
 }
+
+/* DINO */
+const gameBox=document.getElementById("gameBox");
+const dino=document.getElementById("dino");
+const cactus=document.getElementById("cactus");
+const scoreEl=document.getElementById("score");
+const highEl=document.getElementById("highscore");
+
+let jumping=false,score=0,speed=5,gameInterval,scoreInterval;
+let highscore=localStorage.getItem("riza_highscore")||0;
+highEl.textContent="High: "+highscore;
+
+function jump(){
+if(jumping)return;
+jumping=true;
+let up=0;
+let jumpUp=setInterval(()=>{
+if(up>=70){
+clearInterval(jumpUp);
+let down=setInterval(()=>{
+if(up<=0){clearInterval(down);jumping=false;}
+up-=5;
+dino.style.bottom=up+"px";
+},20);
+}
+up+=5;
+dino.style.bottom=up+"px";
+},20);
+}
+
+document.addEventListener("keydown",function(e){
+if(gameBox.style.display==="block"){
+if(e.code==="Space"){e.preventDefault();jump();}
+}
+});
+
+function startGame(){
+if(gameInterval) clearInterval(gameInterval);
+if(scoreInterval) clearInterval(scoreInterval);
+
+gameBox.style.display="block";
+score=0;
+speed=5;
+scoreEl.textContent="Score: 0";
+
+gameInterval=setInterval(()=>{
+let cactusPos=cactus.offsetLeft;
+if(cactusPos<-20){
+cactus.style.right="-20px";
+speed+=0.5;
+}else{
+cactus.style.right=(parseInt(getComputedStyle(cactus).right))+speed+"px";
+}
+
+let dinoBottom=parseInt(getComputedStyle(dino).bottom);
+if(cactusPos<60 && cactusPos>0 && dinoBottom<20){
+stopGame();
+}
+},20);
+
+scoreInterval=setInterval(()=>{
+score++;
+scoreEl.textContent="Score: "+score;
+if(score>highscore){
+highscore=score;
+localStorage.setItem("riza_highscore",highscore);
+highEl.textContent="High: "+highscore;
+}
+},100);
+}
+
+function stopGame(){
+clearInterval(gameInterval);
+clearInterval(scoreInterval);
+gameBox.style.display="none";
 }
 </script>
+
 </body>
 </html>
